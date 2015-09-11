@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Address Book</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script>
+
+      function contactInstance(id, firstName, lastName, email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+      }
+
+      function createContactsTable(header, body) {
+        var table = $("<table/>").addClass("table");
+
+        // add header to table
+        var row = $("<tr/>");
+        $.each(header, function(idx, h) { 
+          row.append($("<th/>").text(h));
+        });
+        table.append(row);
+
+        // add rows to table
+        $.each(body, function(idx, r) {
+          var row = $("<tr/>");
+          // add colums to row
+          $.each(r, function(idx, c) { 
+            row.append($("<td/>").text(c));
+          });
+          table.append(row);
+        });
+
+        return table;
+      }
+
+      function showContactsTable(container) {
+        // get contacts from the web service
+        $.ajax({
+          type:"GET",
+          url:"webapi/contacts",
+          contentType:"application/json",
+          dataType:"json"
+        }).done(function(data) {
+          // contacts table header
+          var header = ["Id", "First Name", "Last Name", "Email Address"];
+
+          // contacts table body
+          var body = [];
+          $.each(data, function (idx, contact) {
+            body[idx] = new contactInstance(contact.id, contact.firstName,
+              contact.lastName, contact.email);
+          });
+
+          // create contacts table
+          var table = createContactsTable(header, body);
+
+          // show contacts table
+          container.html(table);
+        });
+      }
+
+      function handleContactCreate(container) {
+        var form = container.find("form");
+        var button = form.find("button");
+
+        button.click(function() {
+          // create the new contact
+          var contact = new contactInstance(
+            form.find("#id").val(),
+            form.find("#firstName").val(),
+            form.find("#lastName").val(),
+            form.find("#email").val()
+          );
+          // post it to the web service
+          $.ajax({
+            type:"POST",
+            url:"webapi/contacts",
+            data:JSON.stringify(contact),
+            contentType:"application/json",
+            dataType:"json",
+            async: false
+          });
+        });
+      }
+
+      function handleContactUpdate(container) {
+        var form = container.find("form");
+        var button = form.find("button");
+
+        button.click(function() {
+          // get the contact to update
+          var id = form.find("#id").val();
+          // update the contact
+          var contact = new contactInstance(
+            form.find("#id").val(),
+            form.find("#firstName").val(),
+            form.find("#lastName").val(),
+            form.find("#email").val()
+          );
+          // post it to the web service
+          $.ajax({
+            type:"PUT",
+            url:"webapi/contacts/"+id,
+            data:JSON.stringify(contact),
+            contentType:"application/json",
+            dataType:"json",
+            async: false
+          });
+        });
+      }
+
+      function handleContactDelete(container) {
+        var form = container.find("form");
+        var button = form.find("button");
+
+        button.click(function() {
+          // get the contact to remove
+          var id = form.find("#id").val();
+          // delete it from the web service
+          $.ajax({
+            type:"DELETE",
+            url:"webapi/contacts/"+id,
+            contentType:"application/json",
+            dataType:"json",
+            async: false
+          });
+        });
+      }
+
+      $(document).ready(function() {
+        showContactsTable($("#address-book-table"));
+        handleContactCreate($("#address-book-create"));
+        handleContactUpdate($("#address-book-update"));
+        handleContactDelete($("#address-book-delete"));
+      });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="address-book" class="container">
+
+      <div id="address-book-header" class="jumbotron"><h1>My Address Book</h1></div>
+
+      <div id="address-book-tab" class="container-fluid">
+        <ul class="nav nav-tabs">
+          <li><a href="#address-book-create" data-toggle="tab">Create</a></li>
+          <li><a href="#address-book-update" data-toggle="tab">Update</a></li>
+          <li><a href="#address-book-delete" data-toggle="tab">Delete</a></li>
+        </ul>
+        <div class="tab-content">
+          <div id="address-book-create" class="tab-pane panel panel-default panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="firstName">First Name:</label>
+                <div class="col-sm-10">
+                  <input id="firstName" class="form-control" type="text" placeholder="Enter First Name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="lastName">Last Name:</label>
+                <div class="col-sm-10">
+                  <input id="lastName" class="form-control" type="text" placeholder="Enter Last Name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="email">Email:</label>
+                <div class="col-sm-10">
+                  <input id="email" class="form-control" type="email" placeholder="Enter Email">
+                </div>
+              </div>
+              <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div id="address-book-update" class="tab-pane panel panel-default panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="Id">Id:</label>
+                <div class="col-sm-10">
+                  <input id="id" class="form-control" type="text" placeholder="Enter Id">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="firstName">First Name:</label>
+                <div class="col-sm-10">
+                  <input id="firstName" class="form-control" type="text" placeholder="Enter First Name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="lastName">Last Name:</label>
+                <div class="col-sm-10">
+                  <input id="lastName" class="form-control" type="text" placeholder="Enter Last Name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="email">Email:</label>
+                <div class="col-sm-10">
+                  <input id="email" class="form-control" type="email" placeholder="Enter Email">
+                </div>
+              </div>
+              <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div id="address-book-delete" class="tab-pane panel panel-default panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="Id">Id:</label>
+                <div class="col-sm-10">
+                  <input id="id" class="form-control" type="text" placeholder="Enter Id">
+                </div>
+              </div>
+              <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="address-book-table" class="container"></div>
+
+    </div>
+  </body>
+
+</html>
+

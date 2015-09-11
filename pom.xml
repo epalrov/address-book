@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.epalrov.addressbook</groupId>
+    <artifactId>address-book</artifactId>
+    <version>1.0</version>
+    <packaging>war</packaging>
+    <name>address-book</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javaee.api.version>7.0</javaee.api.version>
+        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
+        <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
+        <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
+        <maven.war.plugin.version>2.3</maven.war.plugin.version>
+        <junit.version>4.11</junit.version>
+        <eclipselink.version>2.5.0</eclipselink.version>
+        <glassfish.embedded.version>4.0</glassfish.embedded.version>
+        <cargo.plugin.version>1.4.4</cargo.plugin.version>
+        <glassfish.domain.name>domain1</glassfish.domain.name>
+        <glassfish.home>${user.home}/glassfish4</glassfish.home>
+        <integration.container.id>glassfish4x</integration.container.id>
+    </properties>
+    
+    <repositories>
+        <repository>
+            <id>snapshot-repository.java.net</id>
+            <name>Java.net Snapshot Repository for Maven</name>
+            <url>https://maven.java.net/content/repositories/staging/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>releases-repository.java.net</id>
+            <name>Java.net releases Repository for Maven</name>
+            <url>https://maven.java.net/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+    
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven.clean.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven.war.plugin.version}</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>${cargo.plugin.version}</version>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>redeploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <container>
+                        <containerId>${integration.container.id}</containerId>
+                        <type>installed</type>
+                        <home>${glassfish.home}</home>
+                    </container>
+                    <configuration>
+                        <type>existing</type>
+                        <home>${glassfish.home}/glassfish/domains</home>
+                        <properties>
+                            <cargo.glassfish.domain.name>${glassfish.domain.name}</cargo.glassfish.domain.name>
+                            <cargo.remote.password />
+                        </properties>
+                    </configuration>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>${javaee.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
