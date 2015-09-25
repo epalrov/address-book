@@ -1,5 +1,5 @@
 /*
- * ContactService.java - address book restful webservice
+ * ContactRestService.java - address book RESTful webservice
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -31,11 +31,11 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * ContactService is an EJB exposed as RESTful service
+ * ContactRestService is an EJB exposed as RESTful webservice
  */
 @Stateless
 @Path("/contacts")
-public class ContactService {
+public class ContactRestService {
 
     @PersistenceContext
     private EntityManager em;

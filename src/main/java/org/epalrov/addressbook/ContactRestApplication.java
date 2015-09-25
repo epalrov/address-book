@@ -1,5 +1,5 @@
 /*
- * ContactApplication.java - address book application
+ * ContactRestApplication.java - address book RESTful application
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -11,8 +11,8 @@ package org.epalrov.addressbook;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-/* Address book application endpoints */
-@ApplicationPath("webapi")
-public class ContactApplication extends Application {
+/* Address book RESTful application endpoint */
+@ApplicationPath("rest-api")
+public class ContactRestApplication extends Application {
 }
 

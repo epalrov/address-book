@@ -9,7 +9,7 @@
 var app = angular.module('contactApp', ['ngResource', 'ui.bootstrap']);
 
 app.factory('contactService', function($resource) {
-    return $resource('webapi/contacts/:id', { id: '@id' }, {
+    return $resource('rest-api/contacts/:id', { id: '@id' }, {
         update: {
             method: 'PUT'
         }
