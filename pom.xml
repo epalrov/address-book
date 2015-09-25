@@ -14,6 +14,7 @@
         <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
         <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
         <maven.war.plugin.version>2.3</maven.war.plugin.version>
+        <jaxws-maven-plugin.version>2.2</jaxws-maven-plugin.version>
         <junit.version>4.11</junit.version>
         <eclipselink.version>2.5.0</eclipselink.version>
         <glassfish.embedded.version>4.0</glassfish.embedded.version>
@@ -97,6 +98,24 @@
                         </properties>
                     </configuration>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jax-ws-commons</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>${jaxws-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-wsdl</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wsgen</goal>
+                        </goals>
+                        <configuration>
+                            <sei>org.epalrov.addressbook.ContactSoapService</sei>
+                            <genWsdl>true</genWsdl>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
