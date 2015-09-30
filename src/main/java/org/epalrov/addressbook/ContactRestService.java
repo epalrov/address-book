@@ -20,15 +20,17 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.MediaType;
 
 import javax.persistence.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import java.net.URI;
 import java.util.List;
+import java.net.URI;
 
 /**
  * ContactRestService is an EJB exposed as RESTful webservice
@@ -40,6 +42,9 @@ public class ContactRestService {
     @PersistenceContext
     private EntityManager em;
 
+    @Context
+    private UriInfo uriInfo;
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -49,7 +54,8 @@ public class ContactRestService {
         Query query = em.createNamedQuery("getContacts")
             .setFirstResult(start)
             .setMaxResults(max);
-        return (List<Contact>)query.getResultList();
+        List<Contact> managedContacts = (List<Contact>)query.getResultList();
+        return managedContacts;
     }
 
     @GET
@@ -59,15 +65,20 @@ public class ContactRestService {
     public Contact getContact(@PathParam("id") Integer id) {
         Query query = em.createNamedQuery("getContact")
            .setParameter("id", id);
-        return (Contact)query.getSingleResult();
-        //return em.find(Contact.class, id);
+        Contact managedContact = (Contact)query.getSingleResult();
+        return managedContact;
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createContact(Contact contact) {
         em.persist(contact);
-        return Response.created(URI.create("/" + contact.getId())).build();
+        // contact.Id is generated only after flush!
+        em.flush();
+        // returns the URI of the new resource in the HTTP header Location field
+        URI uri = uriInfo.getAbsolutePathBuilder()
+            .path(contact.getId().toString()).build();
+        return Response.created(uri).build();
     }
 
     @PUT
@@ -80,17 +91,22 @@ public class ContactRestService {
         managedContact.setFirstName(contact.getFirstName());
         managedContact.setLastName(contact.getLastName());
         managedContact.setEmail(contact.getEmail());
-        return Response.ok().status(303).build(); //return a seeOther code
+        // redirect towards the updated resource
+        // URI uri = uriInfo.getAbsolutePathBuilder().build();
+        // return Response.seeOther(uri).build();
+        return Response.ok().status(303).build();
     }
 
     @DELETE
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void deleteContact(@PathParam("id") Integer id) {
+    public Response deleteContact(@PathParam("id") Integer id) {
         Query query = em.createNamedQuery("getContact")
            .setParameter("id", id);
-        Contact contact = (Contact)query.getSingleResult();
-        em.remove(contact);
+        Contact managedContact = (Contact)query.getSingleResult();
+        em.remove(managedContact);
+        // ok response with no body
+        return Response.noContent().build();
     }
 
 }
