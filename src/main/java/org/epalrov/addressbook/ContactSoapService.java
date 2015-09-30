@@ -28,8 +28,8 @@ import java.util.List;
 @WebService(
     serviceName="address-book/soap-api",
     portName = "ContactSoapServicePort",
-    targetNamespace = "http://addressbook.epalrov.org")/*,
-    endpointInterface = "org.epalrov.addressbook.ContactSoapService")*/
+    targetNamespace = "http://addressbook.epalrov.org")
+    // endpointInterface = "org.epalrov.addressbook.ContactSoapService"
 public class ContactSoapService {
 
     @PersistenceContext
@@ -37,13 +37,10 @@ public class ContactSoapService {
 
     @WebMethod(operationName="GetContacts")
     @WebResult(name="contact")
-    public List<Contact> getContacts(
-/*            @DefaultValue("0") @QueryParam("start") int start,
-            @DefaultValue("100") @QueryParam("max") int max*/) {
-        Query query = em.createNamedQuery("getContacts")
-/*            .setFirstResult(start)
-            .setMaxResults(max)*/;
-        return (List<Contact>)query.getResultList();
+    public List<Contact> getContacts() {
+        Query query = em.createNamedQuery("getContacts");
+        List<Contact> managedContacts = (List<Contact>)query.getResultList();
+        return managedContacts;
     }
 
     @WebMethod(operationName="GetContact")
@@ -52,17 +49,22 @@ public class ContactSoapService {
             @WebParam(name="id") Integer id) {
         Query query = em.createNamedQuery("getContact")
            .setParameter("id", id);
-        return (Contact)query.getSingleResult();
+        Contact managedContact = (Contact)query.getSingleResult();
+        return managedContact;
     }
 
     @WebMethod(operationName="CreateContact")
-    public void createContact(
+    @WebResult(name="id")
+    public Integer createContact(
              @WebParam(name="contact") Contact contact) {
         em.persist(contact);
+        em.flush();
+        return contact.getId();
     }
 
     @WebMethod(operationName="UpdateContact")
-    public void updateContact(
+    @WebResult(name="contact")
+    public Contact updateContact(
              @WebParam(name="id") Integer id,
              @WebParam(name="contact") Contact contact) {
         Query query = em.createNamedQuery("getContact")
@@ -71,6 +73,7 @@ public class ContactSoapService {
         managedContact.setFirstName(contact.getFirstName());
         managedContact.setLastName(contact.getLastName());
         managedContact.setEmail(contact.getEmail());
+        return managedContact;
     }
 
     @WebMethod(operationName="DeleteContact")
@@ -78,8 +81,8 @@ public class ContactSoapService {
             @WebParam(name="id") Integer id) {
         Query query = em.createNamedQuery("getContact")
            .setParameter("id", id);
-        Contact contact = (Contact)query.getSingleResult();
-        em.remove(contact);
+        Contact managedContact = (Contact)query.getSingleResult();
+        em.remove(managedContact);
     }
 
 }
