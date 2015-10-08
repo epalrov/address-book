@@ -1,5 +1,5 @@
 /*
- * contact.js - address book front-end using AngularJS
+ * contact-rest.js - address book front-end for RESTful webservice
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -143,3 +143,4 @@ app.controller('contactAlertController', function ($scope) {
         $scope.alerts.splice(index, 1);
     };
 });
+
