@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="contactApp">
+
+  <head>
+    <title>Address Book</title>
+    <meta charset="utf-8">
+
+    <!-- load dependencies from CDNs or fallback to locals -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+    <script> (function () {
+        if (window.angular) { return true; } return false; })() || 
+        document.write('<script src="lib/dependencies/angular.min.js"><\/script>')
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-resource.min.js"></script>
+    <script> (function () {
+        try { window.angular.module('angular.resource'); } catch (e) { return false; } return true; })() || 
+        document.write('<script src="lib/dependencies/angular-resource.min.js"><\/script>')
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min.js"></script>
+    <script> (function () {
+        try { window.angular.module('ui.bootstrap'); } catch (e) { return false; } return true; })() || 
+        document.write('<script src="lib/dependencies/ui-bootstrap-tpls.min.js"><\/script>')
+    </script>
+    <script src="https://x2js.googlecode.com/hg/xml2json.min.js"></script>
+
+    <!-- load application scripts -->
+    <script src="script/contact-soap.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <!--ADDRESS BOOK HEADER-->
+      <div class="jumbotron"><h1>My Address Book</h1></div>
+
+      <!--ADDRESS BOOK MESSAGE-->
+      <div class="message" ng-controller="contactAlertController">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+      </div>
+
+      <!--ADDRESS BOOK NAV BAR-->
+      <div class="container" ng-controller="contactFormController">
+        <tabset>
+        <tab heading="Create" active="false">
+          <div class="tab-pane panel panel-default panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="firstName">First Name:</label>
+                <div class="col-sm-10">
+                  <input id="firstName" type="text" class="form-control" placeholder="Enter First Name"
+                         ng-model="contact.firstName">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="lastName">Last Name:</label>
+                <div class="col-sm-10">
+                  <input id="lastName" type="text" class="form-control" placeholder="Enter Last Name"
+                         ng-model="contact.lastName">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="email">Email:</label>
+                <div class="col-sm-10">
+                  <input id="email" type="email" class="form-control" placeholder="Enter Email"
+                         ng-model="contact.email">
+                </div>
+              </div>
+              <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default"
+                          ng-click="contactCreate()">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </tab>
+        <tab heading="Update" active="false">
+          <div class="tab-pane panel panel-default panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="id">Id:</label>
+                <div class="col-sm-10">
+                  <input id="id" type="text" class="form-control" placeholder="Enter Id"
+                         ng-model="contact.id">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="firstName">First Name:</label>
+                <div class="col-sm-10">
+                  <input id="firstName" type="text" class="form-control" placeholder="Enter First Name"
+                         ng-model="contact.firstName">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="lastName">Last Name:</label>
+                <div class="col-sm-10">
+                  <input id="lastName" type="text" class="form-control" placeholder="Enter Last Name"
+                         ng-model="contact.lastName">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="email">Email:</label>
+                <div class="col-sm-10">
+                  <input id="email" type="email" class="form-control" placeholder="Enter Email"
+                         ng-model="contact.email">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default"
+                          ng-click="contactUpdate()">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </tab>
+        <tab heading="Delete" active="false">
+          <div class="tab-pane panel panel-default panel-body">
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="id">Id:</label>
+                <div class="col-sm-10">
+                  <input id="id" type="text" class="form-control" placeholder="Enter Id"
+                         ng-model="contact.id">
+                </div>
+              </div>
+              <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default"
+                          ng-click="contactDelete()">Submit</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </tab>
+        </tabset>
+      </div>
+
+      <!--ADDRESS BOOK TABLE-->
+      <div class="container" ng-controller="contactTableController">
+        <table class="table">
+          <tr>
+            <th>Id</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email Address</th>
+          </tr>
+          <tr ng-repeat="contact in contacts">
+            <td>{{contact.id}}</td>
+            <td>{{contact.firstName}}</td>
+            <td>{{contact.lastName}}</td>
+            <td>{{contact.email}}</td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+  </body>
+
+</html>
+

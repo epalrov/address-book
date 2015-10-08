@@ -56,7 +56,7 @@ public class ContactSoapService {
     @WebMethod(operationName="CreateContact")
     @WebResult(name="id")
     public Integer createContact(
-             @WebParam(name="contact") Contact contact) {
+            @WebParam(name="contact") Contact contact) {
         em.persist(contact);
         em.flush();
         return contact.getId();
@@ -65,8 +65,8 @@ public class ContactSoapService {
     @WebMethod(operationName="UpdateContact")
     @WebResult(name="contact")
     public Contact updateContact(
-             @WebParam(name="id") Integer id,
-             @WebParam(name="contact") Contact contact) {
+            @WebParam(name="id") Integer id,
+            @WebParam(name="contact") Contact contact) {
         Query query = em.createNamedQuery("getContact")
            .setParameter("id", id);
         Contact managedContact = (Contact)query.getSingleResult();

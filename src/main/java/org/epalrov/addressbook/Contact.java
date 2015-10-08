@@ -23,6 +23,8 @@ import javax.persistence.GenerationType;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Contact entity.
  */
@@ -36,6 +38,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "countContacts",
                 query = "SELECT COUNT(c.id) FROM Contact c")
 })
+@XmlRootElement
 public class Contact implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +60,7 @@ public class Contact implements Serializable {
     @Column(name = "EMAIL")
     @Size(min=3, max=50, message= "{contact.email}")
     @Pattern(regexp = ".+@.+\\.[a-z]+", message= "{contact.email}")
-    protected String email;
+    private String email;
 
     public Contact() {
     }
