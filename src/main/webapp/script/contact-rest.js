@@ -21,9 +21,10 @@ app.controller('contactTableController', function($scope, $rootScope, contactSer
     $scope.contacts = [];
 
     // returns all the contact entries
-    $scope.contactReadAll = function() {
+    $scope.contactRead = function() {
         return contactService.query(
-            function() {
+            function(response) {
+                $scope.contacts = angular.copy(response);
                 $rootScope.$broadcast('success');
             },
             function() {
@@ -34,10 +35,10 @@ app.controller('contactTableController', function($scope, $rootScope, contactSer
 
     // handle the refresh message
     $scope.$on('refresh', function () {
-        $scope.contacts = $scope.contactReadAll();
+        $scope.contactRead();
     });
 
-    $scope.contacts = $scope.contactReadAll();
+    $rootScope.$broadcast('refresh');
 });
 
 app.controller('contactFormController', function($scope, $rootScope, contactService) {
@@ -57,7 +58,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
         $scope.entry.lastName = $scope.contact.lastName;
         $scope.entry.email = $scope.contact.email;
         contactService.save($scope.entry,
-            function() {
+            function(response) {
                 $scope.formClear();
                 $rootScope.$broadcast('success');
                 $rootScope.$broadcast('refresh');
@@ -74,7 +75,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
     // - updates a contact entry
     $scope.contactUpdate = function() {
         $scope.entry = contactService.get({ id: $scope.contact.id },
-            function() {
+            function(response) {
                 if ($scope.contact.firstName != null)
                     $scope.entry.firstName = $scope.contact.firstName;
                 if ($scope.contact.lastName != null)
@@ -86,7 +87,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
                 // https://docs.angularjs.org/api/ngResource/service/$resource)
                 // used for the provided operations (query, get, save, delete)
                 $scope.entry.$update({ id: $scope.contact.id }, $scope.contact,
-                    function() {
+                    function(response) {
                         $scope.formClear();
                         $rootScope.$broadcast('success');
                         $rootScope.$broadcast('refresh');
@@ -104,7 +105,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
     // - deletes a contact entry
     $scope.contactDelete = function() {
         contactService.delete({ id: $scope.contact.id },
-            function() {
+            function(response) {
                 $scope.formClear();
                 $rootScope.$broadcast('success');
                 $rootScope.$broadcast('refresh');

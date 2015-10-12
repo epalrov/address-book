@@ -6,7 +6,7 @@ description:    Example of implementation of a simple Address Book as a single
                  - WEB technologies (HTML, CSS, JavaScript).
                  - WEB frameworks (Bootstrap, jQuery, AngularJS).
                 RESTful back-end:
-                 - JEE technologies (JAX-RS, EJB, JPA).
+                 - JEE technologies (JAX-RS, JAX-WS, WebSocket, EJB, JPA).
 
 build:          mvn clean install
 

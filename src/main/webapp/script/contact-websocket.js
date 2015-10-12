@@ -1,5 +1,5 @@
 /*
- * contact-soap.js - address book front-end for SOAP webservice
+ * contact-websocket.js - address book front-end for WebSocket service
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -8,101 +8,45 @@
 
 var app = angular.module('contactApp', ['ui.bootstrap']);
 
-app.factory('$soap', ['$http', function($http) {
+app.factory('$ws', ['$q', function($q) {
     return {
-        post: function(url, ns, reqOp, reqObj, resOp, resObj) {
-            return $http({
-                method: 'POST',
-                url: url,
-                headers: { 'Content-Type': 'text/xml; charset=utf-8' },
-                data: null, // filled by the interceptor
-                // custom objects used by the interceptor
-                soap: true,
-                ns: ns,
-                reqOp: reqOp,
-                reqObj: reqObj,
-                resOp: resOp,
-                resObj: resObj
-            });
+        post: function(url, obj) {
+            var deferred = $q.defer();
+
+            var ws = new WebSocket(url);
+            ws.onopen = function(evt) {
+                ws.send(JSON.stringify(obj));
+            }
+            ws.onmessage = function(evt) {
+                deferred.resolve(JSON.parse(evt.data));
+                ws.close();
+            }
+            ws.onerror = function(evt) {
+                deferred.reject();
+                ws.close();
+            }
+            return deferred.promise;
         }
     }
 }]);
 
-app.factory('$soapInterceptor', ['$q', function($q) {
-    return {
-        'request': function(request) {
-            // convert to XML and add SOAP envelope
-            if (request.soap != undefined) {
-                var start = '<?xml version="1.0" encoding="utf-8"?>'
-                    + '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">'
-                    +    '<S:Body>';
-                var stop = ''
-                    +    '</S:Body>'
-                    + '</S:Envelope>';
-                var x2js = new X2JS();
-                var reqXml = ''
-                    + '<ns2:' + request.reqOp + ' xmlns:ns2="' + request.ns + '">'
-                    + x2js.json2xml_str(request.reqObj)
-                    + '</ns2:' + request.reqOp + '>'
-
-                request.data = start + reqXml + stop;
-            }
-            return request;
-        },
-        'response': function(response) {
-            // remove soap envelope and convert to JSON
-            if (response.config.soap != undefined) {
-                var start = response.data.search(/<S:Body>/g);
-                var stop = response.data.search(/<\/S:Body>/g);
-                // var substr = response.data.match(/(.*)<*:Body>(.*)<\/.*:Body>(.*)/g);
-                if (start > 0 && stop > start) {
-                    var x2js = new X2JS();
-                    var resXml = response.data.slice(start + 8, stop);
-                    var resJson = x2js.xml_str2json(resXml);
-                    if (response.config.resOp)
-                        resJson = resJson[response.config.resOp];
-                    if (response.config.resObj)
-                        resJson = resJson[response.config.resObj];
-                    response = resJson;
-                }
-            }
-            return response;
-        }
-    };
-}]);
-
-app.config(['$httpProvider', function($httpProvider) {  
-    $httpProvider.interceptors.push('$soapInterceptor')
-}]);
-
-app.factory('contactService', ['$soap', function($soap) {
-    var ns = 'http://addressbook.epalrov.org';
-    var url = '/address-book/soap-api/ContactSoapService';
+app.factory('contactService', ['$ws', function($ws) {
+    var url = 'ws://localhost:8080/address-book/ws-api/contacts/';
     return {
         query: function() {
-            return $soap.post(url, ns,
-                'GetContacts', { },
-                'GetContactsResponse', 'contact');
+            return $ws.post(url + 'read', { });
         },
         get: function(id) {
-            return $soap.post(url, ns,
-                'GetContact', { 'id': id },
-                'GetContactResponse', 'contact');
+            return $ws.post(url + 'read', { 'id' : id });
         },
         save: function(contact) {
-            return $soap.post(url, ns,
-                'CreateContact', { 'contact': contact },
-                'CreateContactResponse', 'id');
+            return $ws.post(url + 'create', contact);
         },
         update: function(id, contact) {
-            return $soap.post(url, ns,
-                'UpdateContact', { 'id': id, 'contact': contact },
-                'UpdateContactResponse', 'contact');
+            return $ws.post(url + 'update', contact);
         },
         delete: function(id) {
-            return $soap.post(url, ns,
-                'DeleteContact', { 'id': id },
-                'DeleteContactResponse', '');
+            return $ws.post(url + 'delete', { 'id': id });
         }
     }
 }]);
@@ -150,7 +94,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
                 $rootScope.$broadcast('success');
                 $rootScope.$broadcast('refresh');
             },
-            function(error) {
+            function() {
                 $rootScope.$broadcast('error');
             }
         );
@@ -176,7 +120,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
                         $rootScope.$broadcast('success');
                         $rootScope.$broadcast('refresh');
                     },
-                    function(error) {
+                    function() {
                         $rootScope.$broadcast('error');
                     }
                 );
@@ -194,7 +138,7 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
                 $rootScope.$broadcast('success');
                 $rootScope.$broadcast('refresh');
             },
-            function(error) {
+            function() {
                 $rootScope.$broadcast('error');
             }
         );
