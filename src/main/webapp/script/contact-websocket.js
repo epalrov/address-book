@@ -31,7 +31,7 @@ app.factory('$ws', ['$q', function($q) {
 }]);
 
 app.factory('contactService', ['$ws', function($ws) {
-    var url = 'ws://localhost:8080/address-book/ws-api/contacts/';
+    var url = 'ws://' + location.host + '/address-book/ws-api/contacts/';
     return {
         query: function() {
             return $ws.post(url + 'read', { });

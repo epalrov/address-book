@@ -2,10 +2,10 @@ project:        Address Book
 
 description:    Example of implementation of a simple Address Book as a single
                 page application (SPA) within a thin server architecture (TSA).
-                Responsive front-end:
+                Front-end:
                  - WEB technologies (HTML, CSS, JavaScript).
-                 - WEB frameworks (Bootstrap, jQuery, AngularJS).
-                RESTful back-end:
+                 - JS frameworks (Bootstrap, jQuery, AngularJS).
+                Back-end:
                  - JEE technologies (JAX-RS, JAX-WS, WebSocket, EJB, JPA).
 
 build:          mvn clean install
