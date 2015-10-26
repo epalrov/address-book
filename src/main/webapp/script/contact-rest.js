@@ -177,22 +177,22 @@ app.controller('contactFormController', function($scope, $modalInstance, contact
     };
 });
 
-app.controller('contactAlertController', function ($scope) {
+app.controller('contactAlertController', function($scope) {
     // message handler
     // - operation success
-    $scope.$on('success', function () {
+    $scope.$on('success', function() {
         $scope.alerts = [
             { type: 'success', msg: 'Server ok!' }
         ];
     });
     // - operation failure
-    $scope.$on('error', function () {
+    $scope.$on('error', function() {
         $scope.alerts = [
             { type: 'danger', msg: 'Server failure!' }
         ];
     });
 
-    $scope.closeAlert = function (index) {
+    $scope.close = function(index) {
         $scope.alerts.splice(index, 1);
     };
 });

@@ -5,7 +5,7 @@
     <title>Address Book</title>
     <meta charset="utf-8">
 
-    <!-- load dependencies from CDNs or fallback to locals -->
+    <!-- Address Book Dependencies - from CDNs or fallback to locals -->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
     <script> (function () {
@@ -22,42 +22,58 @@
         try { window.angular.module('ui.bootstrap'); } catch (e) { return false; } return true; })() || 
         document.write('<script src="lib/dependencies/ui-bootstrap-tpls.min.js"><\/script>')
     </script>
+    <script src="https://x2js.googlecode.com/hg/xml2json.min.js"></script>
 
-    <!-- load application scripts -->
-    <script src="script/contact-rest.js"></script>
+    <!-- Address Book Scripts - RESTful/SOAP/WebSocket -->
+    <script> (function () {
+        if (window.location.search.indexOf('rest') >= 0) {
+            document.write('<script src="script/contact-rest.js"><\/script>');
+        } else if (window.location.search.indexOf('soap') >= 0) {
+            document.write('<script src="script/contact-soap.js"><\/script>');
+        } else if (window.location.search.indexOf('websocket') >= 0) {
+            document.write('<script src="script/contact-websocket.js"><\/script>');
+        } else {
+            document.write('<script src="script/contact-rest.js"><\/script>');
+        }
+        })()
+    </script>
   </head>
 
   <body>
     <div class="container">
-      <!--ADDRESS BOOK HEADER-->
+      <!-- Address Book Header -->
       <div class="jumbotron"><h1>My Address Book</h1></div>
 
-      <!--ADDRESS BOOK MESSAGE-->
+      <!-- Address Book Message Alert -->
       <div class="message" ng-controller="contactAlertController">
-        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="close($index)">
           {{alert.msg}}
         </alert>
       </div>
 
-      <!--ADDRESS BOOK TABLE-->
+      <!-- Address Book Table -->
       <div class="container" ng-controller="contactTableController">
-        <table class="table">
-          <tr>
-            <th>Id</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email Address</th>
-            <td><button class="btn btn-xs btn-default" ng-click="create()"><b>create</b></button><td>
-            <td><button class="btn btn-xs btn-default" ng-click="read()"><b>read</b></button><td>
-          </tr>
-          <tr ng-repeat="contact in contacts">
-            <td ng-bind="contact.id"></td>
-            <td ng-bind="contact.firstName"></td>
-            <td ng-bind="contact.lastName"></td>
-            <td ng-bind="contact.email"></td>
-            <td><button class="btn btn-xs btn-default" ng-click="update(contact)">update</button><td>
-            <td><button class="btn btn-xs btn-default" ng-click="delete(contact)">delete</button><td>
-          </tr>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email Address</th>
+              <th><button class="btn btn-xs btn-link" ng-click="create()">Create</button><th>
+              <th><button class="btn btn-xs btn-link" ng-click="read()">Read</button><th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="contact in contacts">
+              <td ng-bind="contact.id"></td>
+              <td ng-bind="contact.firstName"></td>
+              <td ng-bind="contact.lastName"></td>
+              <td ng-bind="contact.email"></td>
+              <td><button class="btn btn-xs btn-link" ng-click="update(contact)">Update</button><td>
+              <td><button class="btn btn-xs btn-link" ng-click="delete(contact)">Delete</button><td>
+            </tr>
+          </tbody>
         </table>
       </div>
 

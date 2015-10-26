@@ -107,10 +107,30 @@ app.factory('contactService', ['$soap', function($soap) {
     }
 }]);
 
-app.controller('contactTableController', function($scope, $rootScope, contactService) {
+app.controller('contactTableController', function($scope, $rootScope, $modal, contactService) {
     // table model
     $scope.contacts = [];
+    // form model
+    $scope.contact = {
+        id : null,
+        firstName : null,
+        lastName : null,
+        email : null
+    };
 
+    // CRUD operations
+    // - creates a new contact entry (low lewel)
+    $scope.contactCreate = function() {
+        contactService.save($scope.contact).then(
+            function(response) {
+                $rootScope.$broadcast('success');
+                $rootScope.$broadcast('refresh');
+            },
+            function(error) {
+                $rootScope.$broadcast('error');
+            }
+        );
+    };
     // returns all the contact entries
     $scope.contactRead = function() {
         contactService.query().then(
@@ -122,42 +142,6 @@ app.controller('contactTableController', function($scope, $rootScope, contactSer
                 $rootScope.$broadcast('error');
             }
 	);
-    };
-
-    // handle the refresh message
-    $scope.$on('refresh', function () {
-        $scope.contactRead();
-    });
-
-    $rootScope.$broadcast('refresh');
-});
-
-app.controller('contactFormController', function($scope, $rootScope, contactService) {
-    // form model
-    $scope.contact = {
-        id : null, 
-        firstName : null,
-        lastName : null,
-        email : null
-    };
-
-    // CRUD operations
-    // - creates a new contact entry
-    $scope.contactCreate = function() {
-        contactService.save($scope.contact).then(
-            function(response) {
-                $scope.formClear();
-                $rootScope.$broadcast('success');
-                $rootScope.$broadcast('refresh');
-            },
-            function(error) {
-                $rootScope.$broadcast('error');
-            }
-        );
-    };
-    // - reads a single contact entry
-    $scope.contactRead = function() {
-        contactService.get($scope.contact.id);
     };
     // - updates a contact entry
     $scope.contactUpdate = function() {
@@ -172,7 +156,6 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
                     contact.email = $scope.contact.email;
                 contactService.update($scope.contact.id, contact).then(
                     function(response) {
-                        $scope.formClear();
                         $rootScope.$broadcast('success');
                         $rootScope.$broadcast('refresh');
                     },
@@ -190,7 +173,6 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
     $scope.contactDelete = function() {
         contactService.delete($scope.contact.id).then(
             function(response) {
-                $scope.formClear();
                 $rootScope.$broadcast('success');
                 $rootScope.$broadcast('refresh');
             },
@@ -200,31 +182,102 @@ app.controller('contactFormController', function($scope, $rootScope, contactServ
         );
     };
 
-    $scope.formClear = function() {
-       $scope.contact.id = null;
-       $scope.contact.firstName = null;
-       $scope.contact.lastName = null;
-       $scope.contact.email = null;
+    // CRUD operations (high lewel)
+    // - creates a new contact entry
+    $scope.create = function() {
+        $modal.open({
+            animation: true,
+            templateUrl: 'form.html',
+            controller: 'contactFormController',
+            resolve: {
+                contact: function() {
+                    // init an empty form
+                    $scope.contact.id = 0;
+                    $scope.contact.firstName = null;
+                    $scope.contact.lastName = null;
+                    $scope.contact.email = null;
+                    return $scope.contact;
+                }
+            }
+        }).result.then(
+            function(contact) { // modal close (Ok): create the new contact
+                $scope.contactCreate();
+            },
+            function() { // modal dismiss (Cancel): do nothing
+            }
+        );
+    };
+    // - reads all the contact entries
+    $scope.read = function() {
+        $scope.contactRead();
     };
 
+    // - updates a contact entry
+    $scope.update = function(contact) {
+        $modal.open({
+            animation: true,
+            templateUrl: 'form.html',
+            controller: 'contactFormController',
+            resolve: {
+                contact: function() {
+                    // init the form with the current values
+                    $scope.contact = angular.copy(contact);
+                    return $scope.contact;
+                }
+            }
+        }).result.then(
+            function(contact) { // modal close (Ok): update the contact
+                $scope.contact = angular.copy(contact);
+                $scope.contactUpdate();
+            },
+            function() { // modal dismiss (Cancel): do nothing
+            }
+        );
+    };
+    // - deletes a contact entry
+    $scope.delete = function(contact) {
+        $scope.contact = angular.copy(contact);
+        $scope.contactDelete();
+    };
+
+    // handle the refresh message
+    $scope.$on('refresh', function () {
+        $scope.contactRead();
+    });
+
+    $rootScope.$broadcast('refresh');
 });
 
-app.controller('contactAlertController', function ($scope) {
+app.controller('contactFormController', function($scope, $modalInstance, contact) {
+    // form model
+    $scope.contact = contact;
+
+    // - button Ok: close the form returning the new inputs
+    $scope.ok = function() {
+        $modalInstance.close($scope.contact);
+    };
+    // - button Cancel: simply dismiss the form
+    $scope.cancel = function() {
+        $modalInstance.dismiss();
+    };
+});
+
+app.controller('contactAlertController', function($scope) {
     // message handler
     // - operation success
-    $scope.$on('success', function () {
+    $scope.$on('success', function() {
         $scope.alerts = [
             { type: 'success', msg: 'Server ok!' }
         ];
     });
     // - operation failure
-    $scope.$on('error', function () {
+    $scope.$on('error', function() {
         $scope.alerts = [
             { type: 'danger', msg: 'Server failure!' }
         ];
     });
 
-    $scope.closeAlert = function (index) {
+    $scope.close = function(index) {
         $scope.alerts.splice(index, 1);
     };
 });
