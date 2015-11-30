@@ -49,12 +49,20 @@ public class ContactRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public List<Contact> getContacts(
-            @DefaultValue("0") @QueryParam("start") int start,
-            @DefaultValue("100") @QueryParam("max") int max) {
-        Query query = em.createNamedQuery("getContacts")
+            @DefaultValue("0") @QueryParam("start") Integer start,
+            @DefaultValue("100") @QueryParam("max") Integer max,
+            @DefaultValue("") @QueryParam("key") String key) {
+        Query query;
+        if (key.length() == 0) {
+            query = em.createNamedQuery("getContacts");
+        } else {
+            query = em.createNamedQuery("findContacts")
+                .setParameter("key", "%" + key + "%");
+        }
+        List<Contact> managedContacts = (List<Contact>)query
             .setFirstResult(start)
-            .setMaxResults(max);
-        List<Contact> managedContacts = (List<Contact>)query.getResultList();
+            .setMaxResults(max)
+            .getResultList();
         return managedContacts;
     }
 

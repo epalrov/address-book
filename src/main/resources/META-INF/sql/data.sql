@@ -4,3 +4,8 @@ INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Wile E.', 'Coyote', 'w
 INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Daffy', 'Duck', 'daffy.duck@warner.com')
 INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Donald','Duck','donald.duck@disney.com')
 INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Taz','','tasmanian.devil@warner.com')
+INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Alan','Ford','alan.ford@tnt.it')
+INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Cattivik', '', 'cattivick@bonvi.it')
+INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Lupo', 'Alberto', 'albertoandmarta@silver.it')
+INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Sturmtruppen','', 'sturmtruppen@bonvi.it')
+INSERT INTO "CONTACT" (FIRSTNAME,LASTNAME,EMAIL) VALUES ('Cocco', 'Bill', 'cocco.bill@jacovitti.it')

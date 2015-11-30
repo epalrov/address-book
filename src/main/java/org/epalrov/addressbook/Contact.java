@@ -32,9 +32,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "CONTACT")
 @NamedQueries({
     @NamedQuery(name = "getContact",
-                query = "SELECT c FROM Contact c WHERE c.id = :id"),
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.id = :id"),
     @NamedQuery(name = "getContacts",
-                query = "SELECT c FROM Contact c ORDER BY c.id"),
+                query = "SELECT c FROM Contact c " +
+                        "ORDER BY c.firstName,c.lastName"),
+    @NamedQuery(name = "findContacts",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE CONCAT(c.firstName, ' ', " +
+                        "             c.lastName, ' ', " + 
+                        "             c.email) LIKE :key " +
+                        "ORDER BY c.firstName,c.lastName"),
     @NamedQuery(name = "countContacts",
                 query = "SELECT COUNT(c.id) FROM Contact c")
 })
@@ -50,11 +58,11 @@ public class Contact implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @Column(name = "FIRSTNAME")
-    @Size(min=3, max=50, message="{contact.firstname}")
+    @Size(min=0, max=50, message="{contact.firstname}")
     private String firstName;
     @Basic(optional = false)
     @Column(name = "LASTNAME")
-    @Size(min=3, max=50, message="{contact.lastname}")
+    @Size(min=0, max=50, message="{contact.lastname}")
     private String lastName;
     @Basic(optional = false)
     @Column(name = "EMAIL")

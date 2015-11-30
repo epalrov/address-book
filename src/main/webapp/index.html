@@ -4,79 +4,89 @@
   <head>
     <title>Address Book</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Address Book Dependencies - from CDNs or fallback to locals -->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
     <script> (function () {
-        if (window.angular) { return true; } return false; })() || 
-        document.write('<script src="lib/dependencies/angular.min.js"><\/script>')
+      if (window.angular) { return true; } return false; })() || 
+      document.write('<script src="lib/angular.min.js"><\/script>')
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-resource.min.js"></script>
     <script> (function () {
-        try { window.angular.module('angular.resource'); } catch (e) { return false; } return true; })() || 
-        document.write('<script src="lib/dependencies/angular-resource.min.js"><\/script>')
+      try { window.angular.module('angular.resource'); } catch (e) { return false; } return true; })() || 
+      document.write('<script src="lib/angular-resource.min.js"><\/script>')
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min.js"></script>
     <script> (function () {
-        try { window.angular.module('ui.bootstrap'); } catch (e) { return false; } return true; })() || 
-        document.write('<script src="lib/dependencies/ui-bootstrap-tpls.min.js"><\/script>')
+      try { window.angular.module('ui.bootstrap'); } catch (e) { return false; } return true; })() || 
+      document.write('<script src="lib/ui-bootstrap-tpls.min.js"><\/script>')
     </script>
     <script src="https://x2js.googlecode.com/hg/xml2json.min.js"></script>
 
     <!-- Address Book Scripts - RESTful/SOAP/WebSocket -->
+    <link rel="stylesheet" href="css/contact-style.css">
     <script> (function () {
-        if (window.location.search.indexOf('rest') >= 0) {
-            document.write('<script src="script/contact-rest.js"><\/script>');
-        } else if (window.location.search.indexOf('soap') >= 0) {
-            document.write('<script src="script/contact-soap.js"><\/script>');
-        } else if (window.location.search.indexOf('websocket') >= 0) {
-            document.write('<script src="script/contact-websocket.js"><\/script>');
-        } else {
-            document.write('<script src="script/contact-rest.js"><\/script>');
-        }
-        })()
+      if (window.location.search.indexOf('rest') >= 0) {
+        document.write('<script src="js/contact-rest.js"><\/script>');
+      } else if (window.location.search.indexOf('soap') >= 0) {
+        document.write('<script src="js/contact-soap.js"><\/script>');
+      } else if (window.location.search.indexOf('websocket') >= 0) {
+        document.write('<script src="js/contact-websocket.js"><\/script>');
+      } else {
+        document.write('<script src="js/contact-rest.js"><\/script>');
+      } })()
     </script>
   </head>
 
   <body>
     <div class="container">
       <!-- Address Book Header -->
-      <div class="jumbotron"><h1>My Address Book</h1></div>
-
-      <!-- Address Book Message Alert -->
+      <div class="jumbotron">
+        <h1>My Address Book</h1>
+      </div>
+      <!-- Address Book Alert -->
       <div class="message" ng-controller="contactAlertController">
-        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="close($index)">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}"
+               close="close($index)">
           {{alert.msg}}
         </alert>
       </div>
-
-      <!-- Address Book Table -->
-      <div class="container" ng-controller="contactTableController">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Email Address</th>
-              <th><button class="btn btn-xs btn-link" ng-click="create()">Create</button><th>
-              <th><button class="btn btn-xs btn-link" ng-click="read()">Read</button><th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="contact in contacts">
-              <td ng-bind="contact.id"></td>
-              <td ng-bind="contact.firstName"></td>
-              <td ng-bind="contact.lastName"></td>
-              <td ng-bind="contact.email"></td>
-              <td><button class="btn btn-xs btn-link" ng-click="update(contact)">Update</button><td>
-              <td><button class="btn btn-xs btn-link" ng-click="delete(contact)">Delete</button><td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Address Book -->
+      <div class="container-fluid" ng-controller="contactController">
+        <!-- search and create -->
+        <div class="contact-box">
+          <div class="contact-search">
+            <input class="form-control" type="text"
+                   placeholder="Search" ng-model="key" ng-change="read(key)">
+            </input>
+          </div>
+          <button class="btn btn-default" ng-click="create()">
+            <i class="glyphicon glyphicon-plus"></i>
+          </button>
+        </div>
+        <!-- display, update, and delete -->
+        <div ng-repeat="contact in contacts">
+          <div class="contact-box">
+            <div class="contact-item" ng-click="update(contact)">
+              <h1>
+                <i class="glyphicon glyphicon-user"></i>
+              </h1>
+              <div>
+                <h3 ng-bind="contact.firstName + ' ' + contact.lastName"></h3>
+                <p>
+                  <i class="glyphicon glyphicon-envelope"></i>
+                  <span ng-bind="contact.email"></span>
+                </p>
+              </div>
+            </div>
+            <button class="btn btn-default" ng-click="delete(contact)">
+              <i class="glyphicon glyphicon-remove"></i>
+            </button>
+          </div>
+        </div>
       </div>
-
     </div>
   </body>
 

@@ -37,9 +37,21 @@ public class ContactSoapService {
 
     @WebMethod(operationName="GetContacts")
     @WebResult(name="contact")
-    public List<Contact> getContacts() {
-        Query query = em.createNamedQuery("getContacts");
-        List<Contact> managedContacts = (List<Contact>)query.getResultList();
+    public List<Contact> getContacts(
+            @WebParam(name="start") Integer start,
+            @WebParam(name="max") Integer max,
+            @WebParam(name="key") String key) {
+        Query query;
+        if (key.length() == 0) {
+            query = em.createNamedQuery("getContacts");
+        } else {
+            query = em.createNamedQuery("findContacts")
+                .setParameter("key", "%" + key + "%");
+        }
+        List<Contact> managedContacts = (List<Contact>)query
+            .setFirstResult(start)
+            .setMaxResults(max)
+            .getResultList();
         return managedContacts;
     }
 

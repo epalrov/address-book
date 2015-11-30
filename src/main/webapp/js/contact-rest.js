@@ -8,18 +8,21 @@
 
 var app = angular.module('contactApp', ['ngResource', 'ui.bootstrap']);
 
-app.factory('contactService', function($resource) {
+app.factory('contactService', ['$resource', function($resource) {
     return $resource('rest-api/contacts/:id', { id: '@id' }, {
         update: {
             method: 'PUT'
         }
     });
-});
+}]);
 
-app.controller('contactTableController', function($scope, $rootScope, $modal, contactService) {
+app.controller('contactController', ['$scope', '$rootScope', '$modal',
+        'contactService', function($scope, $rootScope, $modal, contactService) {
     // table model
     $scope.contacts = [];
-    // form model
+    // search form model
+    $scope.key = "";
+    // create/update form model
     $scope.contact = {
         id : null, 
         firstName : null,
@@ -44,10 +47,11 @@ app.controller('contactTableController', function($scope, $rootScope, $modal, co
             }
         );
     };
-    // - reads all the contact entries
+    // - returns all the contact entries matching the key
     $scope.contactRead = function() {
-        return contactService.query(
+        return contactService.query({ key : $scope.key },
             function(response) {
+                console.log('rest: ' + response);
                 $scope.contacts = angular.copy(response);
                 $rootScope.$broadcast('success');
             },
@@ -103,7 +107,7 @@ app.controller('contactTableController', function($scope, $rootScope, $modal, co
     $scope.create = function() {
         $modal.open({
             animation: true,
-            templateUrl: 'form.html',
+            templateUrl: 'tplt/contact-form.html',
             controller: 'contactFormController',
             resolve: {
                 contact: function() {
@@ -123,15 +127,16 @@ app.controller('contactTableController', function($scope, $rootScope, $modal, co
             }
         );
     };
-    // - reads all the contact entries
-    $scope.read = function() {
+    // - retrieves all the contact entries matching the key
+    $scope.read = function(key) {
+        $scope.key = angular.copy(key);
         $scope.contactRead();
     };
     // - updates a contact entry
     $scope.update = function(contact) {
         $modal.open({
             animation: true,
-            templateUrl: 'form.html',
+            templateUrl: 'tplt/contact-form.html',
             controller: 'contactFormController',
             resolve: {
                 contact: function() {
@@ -161,9 +166,10 @@ app.controller('contactTableController', function($scope, $rootScope, $modal, co
     });
 
     $rootScope.$broadcast('refresh');
-});
+}]);
 
-app.controller('contactFormController', function($scope, $modalInstance, contact) {
+app.controller('contactFormController', ['$scope', '$modalInstance', 'contact',
+        function($scope, $modalInstance, contact) {
     // form model
     $scope.contact = contact;
 
@@ -175,9 +181,9 @@ app.controller('contactFormController', function($scope, $modalInstance, contact
     $scope.cancel = function() {
         $modalInstance.dismiss();
     };
-});
+}]);
 
-app.controller('contactAlertController', function($scope) {
+app.controller('contactAlertController', ['$scope', function($scope) {
     // message handler
     // - operation success
     $scope.$on('success', function() {
@@ -195,5 +201,5 @@ app.controller('contactAlertController', function($scope) {
     $scope.close = function(index) {
         $scope.alerts.splice(index, 1);
     };
-});
+}]);
 

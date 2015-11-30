@@ -1,0 +1,19 @@
+/*
+ * contact-style.css - address book form stylesheet
+ * 
+ * Copyright (C) 2015 Paolo Rovelli 
+ * 
+ * Author: Paolo Rovelli <paolorovelli@yahoo.it> 
+ */
+
+.contact-form {
+  display: flex;
+  align-items: center;
+}
+.contact-form input {
+  flex: 1;
+}
+.contact-form > * {
+  margin: 10px 15px;
+}
+

@@ -1,0 +1,37 @@
+/*
+ * contact-style.css - address book stylesheet
+ * 
+ * Copyright (C) 2015 Paolo Rovelli 
+ * 
+ * Author: Paolo Rovelli <paolorovelli@yahoo.it> 
+ */
+
+.contact-box {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 5px;
+}
+
+.contact-search {
+    flex: 1;
+}
+
+.contact-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    color: #333;
+    border: 1px solid;
+    border-radius: 4px;
+    border-color: #ccc;
+    background-color: #fff;
+}
+.contact-item > * {
+    margin: 0 10px
+}
+.contact-item:hover {
+    color: #333;
+    border-color: #adadad;
+    background-color: #e6e6e6;
+}
+
