@@ -51,7 +51,6 @@ app.controller('contactController', ['$scope', '$rootScope', '$modal',
     $scope.contactRead = function() {
         return contactService.query({ key : $scope.key },
             function(response) {
-                console.log('rest: ' + response);
                 $scope.contacts = angular.copy(response);
                 $rootScope.$broadcast('success');
             },

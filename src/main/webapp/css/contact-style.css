@@ -6,6 +6,10 @@
  * Author: Paolo Rovelli <paolorovelli@yahoo.it> 
  */
 
+body { 
+    padding-top: 70px;
+}
+
 .contact-box {
     display: flex;
     align-items: stretch;

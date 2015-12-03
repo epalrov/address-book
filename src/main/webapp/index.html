@@ -27,67 +27,97 @@
 
     <!-- Address Book Scripts - RESTful/SOAP/WebSocket -->
     <link rel="stylesheet" href="css/contact-style.css">
-    <script> (function () {
-      if (window.location.search.indexOf('rest') >= 0) {
-        document.write('<script src="js/contact-rest.js"><\/script>');
-      } else if (window.location.search.indexOf('soap') >= 0) {
-        document.write('<script src="js/contact-soap.js"><\/script>');
-      } else if (window.location.search.indexOf('websocket') >= 0) {
-        document.write('<script src="js/contact-websocket.js"><\/script>');
-      } else {
-        document.write('<script src="js/contact-rest.js"><\/script>');
-      } })()
-    </script>
+    <script src="js/contact.js"></script>
   </head>
 
   <body>
-    <div class="container">
-      <!-- Address Book Header -->
-      <div class="jumbotron">
-        <h1>My Address Book</h1>
-      </div>
-      <!-- Address Book Alert -->
-      <div class="message" ng-controller="contactAlertController">
-        <alert ng-repeat="alert in alerts" type="{{alert.type}}"
-               close="close($index)">
-          {{alert.msg}}
-        </alert>
-      </div>
-      <!-- Address Book -->
-      <div class="container-fluid" ng-controller="contactController">
-        <!-- search and create -->
-        <div class="contact-box">
-          <div class="contact-search">
-            <input class="form-control" type="text"
-                   placeholder="Search" ng-model="key" ng-change="read(key)">
-            </input>
-          </div>
-          <button class="btn btn-default" ng-click="create()">
-            <i class="glyphicon glyphicon-plus"></i>
+
+    <!-- Address Book Header -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed"
+                  data-toggle="collapse"
+                  data-target="#bs-example-navbar-collapse-1"
+                  aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
           </button>
+          <a class="navbar-brand" href="index.html">
+            <i class="glyphicon glyphicon-user">&nbsp</i>My Address Book
+          </a>
         </div>
-        <!-- display, update, and delete -->
-        <div ng-repeat="contact in contacts">
-          <div class="contact-box">
-            <div class="contact-item" ng-click="update(contact)">
-              <h1>
-                <i class="glyphicon glyphicon-user"></i>
-              </h1>
-              <div>
-                <h3 ng-bind="contact.firstName + ' ' + contact.lastName"></h3>
-                <p>
-                  <i class="glyphicon glyphicon-envelope"></i>
-                  <span ng-bind="contact.email"></span>
-                </p>
-              </div>
-            </div>
-            <button class="btn btn-default" ng-click="delete(contact)">
-              <i class="glyphicon glyphicon-remove"></i>
-            </button>
-          </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+          <ul class="nav navbar-nav">
+            <li class="page-scroll">
+              <a href="index.html">
+                <i class="glyphicon glyphicon-home">&nbsp</i>Home
+              </a>
+            </li>
+            <li class="page-scroll">
+              <a href="#about">
+                <i class="glyphicon glyphicon-info-sign">&nbsp</i>About
+              </a>
+            </li>
+            <li class="page-scroll">
+              <a href="#contact">
+                <i class="glyphicon glyphicon-phone-alt">&nbsp</i>Contact
+              </a>
+            </li>
+            <button type="button" class="btn btn-default navbar-btn">Sign in</button>
+            <button type="button" class="btn btn-default navbar-btn">Sign up</button>
+          </ul>
         </div>
       </div>
+    </nav>
+
+    <!-- Address Book Alert -->
+    <div class="container message" ng-controller="contactAlertController">
+      <alert ng-repeat="alert in alerts" type="{{alert.type}}"
+             close="close($index)">
+        {{alert.msg}}
+      </alert>
     </div>
+
+    <!-- Address Book -->
+    <div class="container" ng-controller="contactController">
+     <!-- search and create -->
+     <div class="contact-box">
+       <div class="contact-search">
+         <input class="form-control" type="text"
+                placeholder="Search" ng-model="key" ng-change="read(key)">
+         </input>
+       </div>
+       <button class="btn btn-default" ng-click="create()">
+         <i class="glyphicon glyphicon-plus"></i>
+       </button>
+     </div>
+     <!-- display, update, and delete -->
+     <div ng-repeat="contact in contacts">
+       <div class="contact-box">
+         <div class="contact-item" ng-click="update(contact)">
+           <h1>
+             <i class="glyphicon glyphicon-user"></i>
+           </h1>
+           <div>
+             <h3 ng-bind="contact.firstName + ' ' + contact.lastName"></h3>
+             <p>
+               <i class="glyphicon glyphicon-envelope"></i>
+               <span ng-bind="contact.email"></span>
+             </p>
+           </div>
+         </div>
+         <button class="btn btn-default" ng-click="delete(contact)">
+           <i class="glyphicon glyphicon-remove"></i>
+         </button>
+       </div>
+     </div>
+    </div>
+
   </body>
 
 </html>
