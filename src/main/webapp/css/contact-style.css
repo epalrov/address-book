@@ -30,12 +30,17 @@ body {
     border-color: #ccc;
     background-color: #fff;
 }
-.contact-item > * {
-    margin: 0 10px
-}
 .contact-item:hover {
-    color: #333;
     border-color: #adadad;
     background-color: #e6e6e6;
+}
+.contact-item > * {
+    margin: 0 15px;
+}
+.contact-item > div {
+    flex: 1;
+}
+.contact-item > div h3:hover {
+    text-decoration: underline;
 }
 

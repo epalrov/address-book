@@ -93,27 +93,31 @@
          </input>
        </div>
        <button class="btn btn-default" ng-click="create()">
-         <i class="glyphicon glyphicon-plus"></i>
+         <span aria-hidden="true">&plus;</span>
+         <span class="sr-only">Create</span>
        </button>
      </div>
      <!-- display, update, and delete -->
      <div ng-repeat="contact in contacts">
        <div class="contact-box">
-         <div class="contact-item" ng-click="update(contact)">
+         <div class="contact-item">
            <h1>
              <i class="glyphicon glyphicon-user"></i>
            </h1>
            <div>
-             <h3 ng-bind="contact.firstName + ' ' + contact.lastName"></h3>
+             <h3 class="text-primary"
+                 ng-bind="contact.firstName + ' ' + contact.lastName"
+                 ng-click="update(contact)">
+             </h3>
              <p>
-               <i class="glyphicon glyphicon-envelope"></i>
                <span ng-bind="contact.email"></span>
              </p>
            </div>
+           <button class="btn btn-default close" ng-click="delete(contact)">
+             <span aria-hidden="true">&times;</span>
+             <span class="sr-only">Delete</span>
+           </button>
          </div>
-         <button class="btn btn-default" ng-click="delete(contact)">
-           <i class="glyphicon glyphicon-remove"></i>
-         </button>
        </div>
      </div>
     </div>
