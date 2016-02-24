@@ -1,79 +1,66 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="contactApp">
-
+<html lang="en">
   <head>
     <title>Address Book</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Address Book Dependencies - from CDNs or fallback to locals -->
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
-    <script> (function () {
-      if (window.angular) { return true; } return false; })() || 
-      document.write('<script src="lib/angular.min.js"><\/script>')
-    </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-resource.min.js"></script>
-    <script> (function () {
-      try { window.angular.module('angular.resource'); } catch (e) { return false; } return true; })() || 
-      document.write('<script src="lib/angular-resource.min.js"><\/script>')
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min.js"></script>
-    <script> (function () {
-      try { window.angular.module('ui.bootstrap'); } catch (e) { return false; } return true; })() || 
-      document.write('<script src="lib/ui-bootstrap-tpls.min.js"><\/script>')
-    </script>
-    <script src="https://x2js.googlecode.com/hg/xml2json.min.js"></script>
+    <!-- Address Book Stylesheets -->
+    <!--link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"-->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/contact-style.css">
 
-    <!-- Address Book Scripts - RESTful/SOAP/WebSocket -->
-    <link rel="stylesheet" href="css/contact-style.css">
-    <script src="js/contact.js"></script>
+    <!-- Address Book Dependencies -->
+    <script data-main="scripts/contact" src="bower_components/requirejs/require.js"></script>
   </head>
 
   <body>
 
     <!-- Address Book Header -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed"
-                  data-toggle="collapse"
-                  data-target="#bs-example-navbar-collapse-1"
-                  aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="index.html">
-            <i class="glyphicon glyphicon-user">&nbsp</i>My Address Book
-          </a>
-        </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-          <ul class="nav navbar-nav">
-            <li class="page-scroll">
-              <a href="index.html">
-                <i class="glyphicon glyphicon-home">&nbsp</i>Home
-              </a>
-            </li>
-            <li class="page-scroll">
-              <a href="#about">
-                <i class="glyphicon glyphicon-info-sign">&nbsp</i>About
-              </a>
-            </li>
-            <li class="page-scroll">
-              <a href="#contact">
-                <i class="glyphicon glyphicon-phone-alt">&nbsp</i>Contact
-              </a>
-            </li>
-            <button type="button" class="btn btn-default navbar-btn">Sign in</button>
-            <button type="button" class="btn btn-default navbar-btn">Sign up</button>
-          </ul>
+    <div class="header">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse"
+                    data-target="#js-navbar-collapse"
+                    aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#/">
+              <i class="glyphicon glyphicon-user">&nbsp</i>My Address Book
+            </a>
+          </div>
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse navbar-right navbar-main-collapse"
+               id="js-navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li class="page-scroll">
+                <a href="#/">
+                  <i class="glyphicon glyphicon-home">&nbsp</i>Home
+                </a>
+              </li>
+              <li class="page-scroll">
+                <a href="#/about">
+                  <i class="glyphicon glyphicon-info-sign">&nbsp</i>About
+                </a>
+              </li>
+              <li class="page-scroll">
+                <a href="#/contact">
+                  <i class="glyphicon glyphicon-phone-alt">&nbsp</i>Contact
+                </a>
+              </li>
+              <button type="button" class="btn btn-default navbar-btn">Sign in</button>
+              <button type="button" class="btn btn-default navbar-btn">Sign up</button>
+            </ul>
+          </div>
         </div>
       </div>
-    </nav>
+    </div>
 
     <!-- Address Book Alert -->
     <div class="container message" ng-controller="contactAlertController">
@@ -121,8 +108,14 @@
        </div>
      </div>
     </div>
+    <!-- Address Book Footer -->
+    <div class="footer">
+      <div class="container">
+        <p>with <span class="glyphicon glyphicon-heart"></span> by Paolo Rovelli</p>
+      </div>
+    </div>
 
-  </body>
+ </body>
 
 </html>
 

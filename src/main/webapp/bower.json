@@ -1,0 +1,24 @@
+{
+  "name": "address-book",
+  "version": "0.0.0",
+  "description": "Simple address book web application",
+  "author": "Paolo Rovelli <paolorovelli@yahoo.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.4.0",
+    "angular-resource": "~1.4.0",
+    "angular-bootstrap": "~0.13.0",
+    "bootstrap": "~3.3.5",
+    "requirejs": "~2.1.22",
+    "x2js": "~1.1.7"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.4.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}

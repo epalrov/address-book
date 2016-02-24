@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.epalrov.addressbook</groupId>
@@ -14,11 +17,12 @@
         <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
         <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
         <maven.war.plugin.version>2.3</maven.war.plugin.version>
+        <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
         <jaxws-maven-plugin.version>2.2</jaxws-maven-plugin.version>
         <junit.version>4.11</junit.version>
         <eclipselink.version>2.5.0</eclipselink.version>
-        <glassfish.embedded.version>4.0</glassfish.embedded.version>
         <cargo.plugin.version>1.4.4</cargo.plugin.version>
+        <glassfish.embedded.version>4.0</glassfish.embedded.version>
         <glassfish.domain.name>domain1</glassfish.domain.name>
         <glassfish.home>${user.home}/glassfish4</glassfish.home>
         <integration.container.id>glassfish4x</integration.container.id>
@@ -117,9 +121,40 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>false</skip>
+                    <executable>${glassfish.home}/bin/asadmin</executable>
+                    <successCodes>
+                        <successCode>0</successCode>
+                        <successCode>1</successCode>
+                    </successCodes>
+                    <arguments>
+                        <argument>create-auth-realm</argument>
+                        <argument>--classname</argument>
+                        <!--argument>com.sun.enterprise.security.auth.realm.jdbc.JDBCRealm</argument-->
+                        <argument>com.sun.enterprise.security.auth.realm.file.FileRealm</argument>
+                        <argument>--property</argument>
+                        <!--argument>jaas-context=jdbcRealm:datasource-jndi=java\:comp/DefaultDataSource:user-table=contact.PERSON:user-name-column=email:password-column=password:group-table=contact.GROUPS:group-table-user-name-column=name:group-name-column=name:assign-groups=USERS,ADMINS:digest-algorithm=MD5</argument-->
+                        <argument>jaas-context=fileRealm:file=${glassfish.home}/glassfish/domains/${glassfish.domain.name}/config/contact-keyfile</argument>
+                        <argument>contactRealm</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    
+
     <dependencies>
         <dependency>
             <groupId>javax</groupId>
