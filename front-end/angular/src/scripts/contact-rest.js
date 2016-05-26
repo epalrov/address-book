@@ -1,74 +1,48 @@
 /*
- * contact-websocket.js - address book front-end for WebSocket service
- * 
- * Copyright (C) 2015 Paolo Rovelli 
- * 
- * Author: Paolo Rovelli <paolorovelli@yahoo.it> 
+ * contact-rest.js - address book front-end for RESTful webservice
+ *
+ * Copyright (C) 2015 Paolo Rovelli
+ *
+ * Author: Paolo Rovelli <paolorovelli@yahoo.it>
  */
 
-define(['angular', 'ng-bootstrap'], function (angular) {
 
-    var app = angular.module('contactApp', ['ui.bootstrap']);
-    
-    app.factory('$ws', ['$q', function($q) {
-        return {
-            post: function(url, obj) {
-                var deferred = $q.defer();
-    
-                var ws = new WebSocket(url);
-                ws.onopen = function(evt) {
-                    ws.send(JSON.stringify(obj));
-                };
-                ws.onmessage = function(evt) {
-                    deferred.resolve(JSON.parse(evt.data));
-                    ws.close();
-                };
-                ws.onerror = function(evt) {
-                    deferred.reject();
-                    ws.close();
-                };
-                return deferred.promise;
+
+define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
+
+    var app = angular.module('contactApp', ['ngResource', 'ui.bootstrap']);
+
+    app.factory('contactService', ['$resource', function($resource) {
+        // return $resource('rest-api/contacts/:id', { id: '@id' }, {
+        return $resource('http://localhost:8080/address-book-jee/rest-api/contacts/:id', { id: '@id' }, {
+            update: {
+                method: 'PUT'
             }
-        };
+        });
     }]);
-    
-    app.factory('contactService', ['$ws', function($ws) {
-        var url = 'ws://' + location.host + '/address-book/ws-api/contacts/';
-        return {
-            query: function() {
-                return $ws.post(url + 'read', { });
-            },
-            get: function(id) {
-                return $ws.post(url + 'read', { 'id' : id });
-            },
-            save: function(contact) {
-                return $ws.post(url + 'create', contact);
-            },
-            update: function(id, contact) {
-                return $ws.post(url + 'update', contact);
-            },
-            delete: function(id) {
-                return $ws.post(url + 'delete', { 'id': id });
-            }
-        };
-    }]);
-    
+
     app.controller('contactController', ['$scope', '$rootScope', '$modal',
             'contactService', function($scope, $rootScope, $modal, contactService) {
         // table model
         $scope.contacts = [];
-        // form model
+        // search form model
+        $scope.key = "";
+        // create/update form model
         $scope.contact = {
             id : null,
             firstName : null,
             lastName : null,
             email : null
         };
-    
-        // CRUD operations (low level)
+
+        // CRUD operations (low lewel)
         // - creates a new contact entry
         $scope.contactCreate = function() {
-            contactService.save($scope.contact).then(
+            $scope.entry = { };
+            $scope.entry.firstName = $scope.contact.firstName;
+            $scope.entry.lastName = $scope.contact.lastName;
+            $scope.entry.email = $scope.contact.email;
+            contactService.save($scope.entry,
                 function(response) {
                     $rootScope.$broadcast('success');
                     $rootScope.$broadcast('refresh');
@@ -78,33 +52,36 @@ define(['angular', 'ng-bootstrap'], function (angular) {
                 }
             );
         };
-        // - reads all the contact entries
+        // - returns all the contact entries matching the key
         $scope.contactRead = function() {
-            contactService.query().then(
+            return contactService.query({ key : $scope.key },
                 function(response) {
                     $scope.contacts = angular.copy(response);
                     $rootScope.$broadcast('success');
-                }, 
-                function(error) {
+                },
+                function() {
                     $rootScope.$broadcast('error');
                 }
-    	);
+            );
         };
         // - updates a contact entry
         $scope.contactUpdate = function() {
-            contactService.get($scope.contact.id).then(
+            $scope.entry = contactService.get({ id: $scope.contact.id },
                 function(response) {
-                    var contact = angular.copy(response);
                     if ($scope.contact.firstName != null) {
-                        contact.firstName = $scope.contact.firstName;
+                        $scope.entry.firstName = $scope.contact.firstName;
                     }
                     if ($scope.contact.lastName != null) {
-                        contact.lastName = $scope.contact.lastName;
+                        $scope.entry.lastName = $scope.contact.lastName;
                     }
                     if ($scope.contact.email != null) {
-                        contact.email = $scope.contact.email;
+                        $scope.entry.email = $scope.contact.email;
                     }
-                    contactService.update($scope.contact.id, contact).then(
+                    // note the instance method for the update operation,
+                    // in contrast to "static" class methods (see
+                    // https://docs.angularjs.org/api/ngResource/service/$resource)
+                    // used for the provided operations (query, get, save, delete)
+                    $scope.entry.$update({ id: $scope.contact.id }, $scope.contact,
                         function(response) {
                             $rootScope.$broadcast('success');
                             $rootScope.$broadcast('refresh');
@@ -121,7 +98,7 @@ define(['angular', 'ng-bootstrap'], function (angular) {
         };
         // - deletes a contact entry
         $scope.contactDelete = function() {
-            contactService.delete($scope.contact.id).then(
+            contactService.delete({ id: $scope.contact.id },
                 function(response) {
                     $rootScope.$broadcast('success');
                     $rootScope.$broadcast('refresh');
@@ -131,7 +108,7 @@ define(['angular', 'ng-bootstrap'], function (angular) {
                 }
             );
         };
-    
+
         // CRUD operations (high lewel)
         // - creates a new contact entry
         $scope.create = function() {
@@ -157,8 +134,9 @@ define(['angular', 'ng-bootstrap'], function (angular) {
                 }
             );
         };
-        // - reads all the contact entries
-        $scope.read = function() {
+        // - retrieves all the contact entries matching the key
+        $scope.read = function(key) {
+            $scope.key = angular.copy(key);
             $scope.contactRead();
         };
         // - updates a contact entry
@@ -188,20 +166,20 @@ define(['angular', 'ng-bootstrap'], function (angular) {
             $scope.contact = angular.copy(contact);
             $scope.contactDelete();
         };
-    
+
         // handle the refresh message
         $scope.$on('refresh', function () {
             $scope.contactRead();
         });
-    
+
         $rootScope.$broadcast('refresh');
     }]);
-    
+
     app.controller('contactFormController', ['$scope', '$modalInstance', 'contact',
             function($scope, $modalInstance, contact) {
         // form model
         $scope.contact = contact;
-    
+
         // - button Ok: close the form returning the new inputs
         $scope.ok = function() {
             $modalInstance.close($scope.contact);
@@ -211,7 +189,7 @@ define(['angular', 'ng-bootstrap'], function (angular) {
             $modalInstance.dismiss();
         };
     }]);
-    
+
     app.controller('contactAlertController', ['$scope', function($scope) {
         // message handler
         // - operation success
@@ -226,12 +204,12 @@ define(['angular', 'ng-bootstrap'], function (angular) {
                 { type: 'danger', msg: 'Server failure!' }
             ];
         });
-    
+
         $scope.close = function(index) {
             $scope.alerts.splice(index, 1);
         };
     }]);
-    
+
     app.init = function () {
         angular.bootstrap(document, ['contactApp']);
     };

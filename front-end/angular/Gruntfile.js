@@ -18,7 +18,7 @@ module.exports = function (grunt) {
     /* Watches files for changes and runs tasks based on the changed files */
     watch: {
       js: {
-        files: ['./scripts/{,*/}*.js'],
+        files: ['src/scripts/{,*/}*.js'],
         tasks: ['newer:jshint:all', 'newer:jscs:all'],
         options: {
           livereload: '<%= connect.options.livereload %>'
@@ -32,9 +32,9 @@ module.exports = function (grunt) {
           livereload: '<%= connect.options.livereload %>'
         },
         files: [
-          './{,*/}*.html',
-          './styles/{,*/}*.css',
-          './images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+          'src/{,*/}*.html',
+          'src/styles/{,*/}*.css',
+          'src/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
         ]
       }
     },
@@ -44,6 +44,7 @@ module.exports = function (grunt) {
       options: {
         port: 9000,
         hostname: 'localhost',
+        base: 'dist',
         livereload: 35729
       },
       livereload: {
@@ -62,7 +63,7 @@ module.exports = function (grunt) {
       all: {
         src: [
           'Gruntfile.js',
-          './scripts/{,*/}*.js'
+          'src/scripts/{,*/}*.js'
         ]
       }
     },
@@ -76,8 +77,37 @@ module.exports = function (grunt) {
       all: {
         src: [
           'Gruntfile.js',
-          './scripts/{,*/}*.js'
+          'src/scripts/{,*/}*.js'
         ]
+      }
+    },
+
+    // Empties folders to start fresh
+    clean: {
+      dist: {
+        files: [{
+          dot: true,
+          src: 'dist/**'
+        }]
+      }
+    },
+
+    // Copies files to places other tasks can use
+    copy: {
+      dist: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: 'src/',
+          dest: 'dist',
+          src: '**'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: 'bower_components/',
+          dest: 'dist/bower_components/',
+          src: '**'
+        }]
       }
     }
 
@@ -92,7 +122,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
-    'newer:jscs'
+    'newer:jscs',
+    'clean:dist',
+    'copy:dist'
   ]);
 };
 

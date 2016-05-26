@@ -1,24 +1,115 @@
 /*
- * contact-rest.js - address book front-end for RESTful webservice
+ * contact-soap.js - address book front-end for SOAP webservice
  *
  * Copyright (C) 2015 Paolo Rovelli
  *
  * Author: Paolo Rovelli <paolorovelli@yahoo.it>
  */
 
+define(['angular', 'ng-bootstrap', 'xml2json'], function (angular) {
 
+    var app = angular.module('contactApp', ['ui.bootstrap']);
 
-define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
-
-    var app = angular.module('contactApp', ['ngResource', 'ui.bootstrap']);
-
-    app.factory('contactService', ['$resource', function($resource) {
-        // return $resource('rest-api/contacts/:id', { id: '@id' }, {
-        return $resource('http://localhost:8080/address-book/rest-api/contacts/:id', { id: '@id' }, {
-            update: {
-                method: 'PUT'
+    app.factory('$soap', ['$http', function($http) {
+        return {
+            post: function(url, ns, reqOp, reqObj, resOp, resObj) {
+                return $http({
+                    method: 'POST',
+                    url: url,
+                    headers: { 'Content-Type': 'text/xml; charset=utf-8' },
+                    data: null, // filled by the interceptor
+                    // custom objects used by the interceptor
+                    soap: true,
+                    ns: ns,
+                    reqOp: reqOp,
+                    reqObj: reqObj,
+                    resOp: resOp,
+                    resObj: resObj
+                });
             }
-        });
+        };
+    }]);
+
+    app.factory('$soapInterceptor', ['$q', function($q) {
+        return {
+            'request': function(request) {
+                // convert to XML and add SOAP envelope
+                if (request.soap !== undefined) {
+                    var start = '<?xml version="1.0" encoding="utf-8"?>'
+                        + '<S:Envelope' + ' '
+                        + 'xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">'
+                        +    '<S:Body>';
+                    var stop = ''
+                        +    '</S:Body>'
+                        + '</S:Envelope>';
+                    var x2js = new X2JS();
+                    var reqXml = ''
+                        + '<ns2:' + request.reqOp + ' '
+                        + 'xmlns:ns2="' + request.ns + '">'
+                        + x2js.json2xml_str(request.reqObj)
+                        + '</ns2:' + request.reqOp + '>';
+
+                    request.data = start + reqXml + stop;
+                }
+                return request;
+            },
+            'response': function(response) {
+                // remove soap envelope and convert to JSON
+                if (response.config.soap !== undefined) {
+                    var start = response.data.search(/<S:Body>/g);
+                    var stop = response.data.search(/<\/S:Body>/g);
+                    if (start > 0 && stop > start) {
+                        var x2js = new X2JS();
+                        var resXml = response.data.slice(start + 8, stop);
+                        var resJson = x2js.xml_str2json(resXml);
+                        if (response.config.resOp) {
+                            resJson = resJson[response.config.resOp];
+                        }
+                        if (response.config.resObj) {
+                            resJson = resJson[response.config.resObj];
+                        }
+                        response = resJson;
+                    }
+                }
+                return response;
+            }
+        };
+    }]);
+
+    app.config(['$httpProvider', function($httpProvider) {
+        $httpProvider.interceptors.push('$soapInterceptor');
+    }]);
+
+    app.factory('contactService', ['$soap', function($soap) {
+        var ns = 'http://addressbook.epalrov.org';
+        var url = '/address-book-jee/soap-api/ContactSoapService';
+        return {
+            query: function(start, max, key) {
+                return $soap.post(url, ns,
+                    'GetContacts', { 'start': start, 'max': max, 'key': key },
+                    'GetContactsResponse', 'contact');
+            },
+            get: function(id) {
+                return $soap.post(url, ns,
+                    'GetContact', { 'id': id },
+                    'GetContactResponse', 'contact');
+            },
+            save: function(contact) {
+                return $soap.post(url, ns,
+                    'CreateContact', { 'contact': contact },
+                    'CreateContactResponse', 'id');
+            },
+            update: function(id, contact) {
+                return $soap.post(url, ns,
+                    'UpdateContact', { 'id': id, 'contact': contact },
+                    'UpdateContactResponse', 'contact');
+            },
+            delete: function(id) {
+                return $soap.post(url, ns,
+                    'DeleteContact', { 'id': id },
+                    'DeleteContactResponse', '');
+            }
+        };
     }]);
 
     app.controller('contactController', ['$scope', '$rootScope', '$modal',
@@ -35,58 +126,58 @@ define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
             email : null
         };
 
-        // CRUD operations (low lewel)
-        // - creates a new contact entry
+        // CRUD operations
+        // - creates a new contact entry (low lewel)
         $scope.contactCreate = function() {
-            $scope.entry = { };
-            $scope.entry.firstName = $scope.contact.firstName;
-            $scope.entry.lastName = $scope.contact.lastName;
-            $scope.entry.email = $scope.contact.email;
-            contactService.save($scope.entry,
+            contactService.save($scope.contact).then(
                 function(response) {
                     $rootScope.$broadcast('success');
                     $rootScope.$broadcast('refresh');
                 },
-                function() {
+                function(error) {
                     $rootScope.$broadcast('error');
                 }
             );
         };
-        // - returns all the contact entries matching the key
+        // returns all the contact entries matching the key
         $scope.contactRead = function() {
-            return contactService.query({ key : $scope.key },
+            contactService.query(0, 100, $scope.key).then(
                 function(response) {
-                    $scope.contacts = angular.copy(response);
+                    // workaround for response with none or one item!
+                    if (response === undefined || response == null) {
+                        $scope.contacts = [];
+                    } else if (response instanceof Array) {
+                        $scope.contacts = angular.copy(response);
+                    } else {
+                        $scope.contacts = angular.copy([ response ]);
+                    }
                     $rootScope.$broadcast('success');
                 },
-                function() {
+                function(error) {
                     $rootScope.$broadcast('error');
                 }
-            );
+    	);
         };
         // - updates a contact entry
         $scope.contactUpdate = function() {
-            $scope.entry = contactService.get({ id: $scope.contact.id },
+            contactService.get($scope.contact.id).then(
                 function(response) {
+                    var contact = angular.copy(response);
                     if ($scope.contact.firstName != null) {
-                        $scope.entry.firstName = $scope.contact.firstName;
+                        contact.firstName = $scope.contact.firstName;
                     }
                     if ($scope.contact.lastName != null) {
-                        $scope.entry.lastName = $scope.contact.lastName;
+                        contact.lastName = $scope.contact.lastName;
                     }
                     if ($scope.contact.email != null) {
-                        $scope.entry.email = $scope.contact.email;
+                        contact.email = $scope.contact.email;
                     }
-                    // note the instance method for the update operation,
-                    // in contrast to "static" class methods (see
-                    // https://docs.angularjs.org/api/ngResource/service/$resource)
-                    // used for the provided operations (query, get, save, delete)
-                    $scope.entry.$update({ id: $scope.contact.id }, $scope.contact,
+                    contactService.update($scope.contact.id, contact).then(
                         function(response) {
                             $rootScope.$broadcast('success');
                             $rootScope.$broadcast('refresh');
                         },
-                        function() {
+                        function(error) {
                             $rootScope.$broadcast('error');
                         }
                     );
@@ -98,12 +189,12 @@ define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
         };
         // - deletes a contact entry
         $scope.contactDelete = function() {
-            contactService.delete({ id: $scope.contact.id },
+            contactService.delete($scope.contact.id).then(
                 function(response) {
                     $rootScope.$broadcast('success');
                     $rootScope.$broadcast('refresh');
                 },
-                function() {
+                function(error) {
                     $rootScope.$broadcast('error');
                 }
             );
@@ -134,11 +225,12 @@ define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
                 }
             );
         };
-        // - retrieves all the contact entries matching the key
+        // - reads all the contact entries
         $scope.read = function(key) {
             $scope.key = angular.copy(key);
             $scope.contactRead();
         };
+
         // - updates a contact entry
         $scope.update = function(contact) {
             $modal.open({

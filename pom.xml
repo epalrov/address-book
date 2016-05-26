@@ -7,44 +7,30 @@
     <groupId>org.epalrov.addressbook</groupId>
     <artifactId>address-book</artifactId>
     <version>1.0</version>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
     <name>address-book</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javaee.api.version>7.0</javaee.api.version>
+
         <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
         <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
         <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
         <maven.war.plugin.version>2.3</maven.war.plugin.version>
-        <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
-        <jaxws-maven-plugin.version>2.2</jaxws-maven-plugin.version>
-        <junit.version>4.11</junit.version>
-        <eclipselink.version>2.5.0</eclipselink.version>
-        <cargo.plugin.version>1.4.4</cargo.plugin.version>
+        <cargo.maven.plugin.version>1.4.4</cargo.maven.plugin.version>
+
         <glassfish.embedded.version>4.0</glassfish.embedded.version>
         <glassfish.domain.name>domain1</glassfish.domain.name>
         <glassfish.home>${user.home}/glassfish4</glassfish.home>
-        <integration.container.id>glassfish4x</integration.container.id>
+        <glassfish.container>glassfish4x</glassfish.container>
     </properties>
-    
-    <repositories>
-        <repository>
-            <id>snapshot-repository.java.net</id>
-            <name>Java.net Snapshot Repository for Maven</name>
-            <url>https://maven.java.net/content/repositories/staging/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>releases-repository.java.net</id>
-            <name>Java.net releases Repository for Maven</name>
-            <url>https://maven.java.net/content/repositories/releases/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
+
+    <modules> 
+        <module>back-end</module> 
+        <module>front-end</module> 
+    </modules> 
     
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -76,7 +62,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>${cargo.plugin.version}</version>
+                <version>${cargo.maven.plugin.version}</version>
                 <inherited>true</inherited>
                 <executions>
                     <execution>
@@ -89,7 +75,7 @@
                 </executions>
                 <configuration>
                     <container>
-                        <containerId>${integration.container.id}</containerId>
+                        <containerId>${glassfish.container}</containerId>
                         <type>installed</type>
                         <home>${glassfish.home}</home>
                     </container>
@@ -103,65 +89,8 @@
                     </configuration>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jvnet.jax-ws-commons</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>${jaxws-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-wsdl</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>wsgen</goal>
-                        </goals>
-                        <configuration>
-                            <sei>org.epalrov.addressbook.ContactSoapService</sei>
-                            <genWsdl>true</genWsdl>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <skip>false</skip>
-                    <executable>${glassfish.home}/bin/asadmin</executable>
-                    <successCodes>
-                        <successCode>0</successCode>
-                        <successCode>1</successCode>
-                    </successCodes>
-                    <arguments>
-                        <argument>create-auth-realm</argument>
-                        <argument>--classname</argument>
-                        <!--argument>com.sun.enterprise.security.auth.realm.jdbc.JDBCRealm</argument-->
-                        <argument>com.sun.enterprise.security.auth.realm.file.FileRealm</argument>
-                        <argument>--property</argument>
-                        <!--argument>jaas-context=jdbcRealm:datasource-jndi=java\:comp/DefaultDataSource:user-table=contact.PERSON:user-name-column=email:password-column=password:group-table=contact.GROUPS:group-table-user-name-column=name:group-name-column=name:assign-groups=USERS,ADMINS:digest-algorithm=MD5</argument-->
-                        <argument>jaas-context=fileRealm:file=${glassfish.home}/glassfish/domains/${glassfish.domain.name}/config/contact-keyfile</argument>
-                        <argument>contactRealm</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>${javaee.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
 </project>
+
