@@ -1,5 +1,5 @@
 /*
- * ContactRestApplicationConfig.java - address book RESTful webservice
+ * ContactApplicationConfig.java - address book application configuration
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -7,10 +7,6 @@
  */
 
 package org.epalrov.addressbook;
-
-import org.epalrov.addressbook.Contact;
-import org.epalrov.addressbook.ContactDataAccessObject;
-import org.epalrov.addressbook.ContactDataAccessObjectInterface;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,13 +27,13 @@ import org.hibernate.SessionFactory;
 import java.util.Properties;
 
 /**
- * ContactRestApplicationConfig
+ * ContactApplicationConfig
  */
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
 @ComponentScan("org.epalrov.addressbook")
-public class ContactRestApplicationConfig {
+public class ContactApplicationConfig {
 
     @Bean(name = "dataSource")
     public DataSource getDataSource() throws NamingException {
@@ -53,9 +49,11 @@ public class ContactRestApplicationConfig {
         properties.put("hibernate.show_sql", "true");
         properties.put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
 
-        LocalSessionFactoryBuilder sessionBuilder = new LocalSessionFactoryBuilder(dataSource);
+        LocalSessionFactoryBuilder sessionBuilder =
+            new LocalSessionFactoryBuilder(dataSource);
         sessionBuilder.addProperties(properties);
         sessionBuilder.addAnnotatedClasses(Contact.class);
+        sessionBuilder.addAnnotatedClasses(User.class);
         return sessionBuilder.buildSessionFactory();
     }
 
@@ -63,6 +61,12 @@ public class ContactRestApplicationConfig {
     @Bean(name = "transactionManager")
     public HibernateTransactionManager getTransactionManager(SessionFactory sessionFactory) {
         return new HibernateTransactionManager(sessionFactory);
+    }
+
+    @Autowired
+    @Bean(name = "userDataAccessObject")
+    public UserDataAccessObject getUserDataAccessObject(SessionFactory sessionFactory) {
+        return new UserDataAccessObject(sessionFactory);
     }
 
     @Autowired

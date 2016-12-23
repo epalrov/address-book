@@ -1,5 +1,5 @@
 /*
- * ContactRestApplication.java - address book RESTful webservice
+ * ContactApplicationInit.java - address book application initializer
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -17,7 +17,7 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-public class ContactRestApplication implements WebApplicationInitializer {
+public class ContactApplicationInit implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
@@ -25,7 +25,7 @@ public class ContactRestApplication implements WebApplicationInitializer {
         // Create the dispatcher servlet's Spring application context
         AnnotationConfigWebApplicationContext dispatcherContext =
             new AnnotationConfigWebApplicationContext();
-        dispatcherContext.register(ContactRestApplicationConfig.class);
+        dispatcherContext.register(ContactApplicationConfig.class);
 
         // Register and map the dispatcher servlet
         ServletRegistration.Dynamic dispatcher =

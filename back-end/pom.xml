@@ -18,18 +18,21 @@
     <properties>
         <javax.javaee.api.version>7.0</javax.javaee.api.version>
         <javax.servlet.api.version>2.5</javax.servlet.api.version>
-        <spring.version>4.2.6.RELEASE</spring.version>
+        <spring.version>4.2.0.RELEASE</spring.version>
+        <spring.security.version>4.2.0.RELEASE</spring.security.version>
         <hibernate.version>4.3.5.Final</hibernate.version>
+        <jackson.version>2.7.4</jackson.version>
         <mojo.exec.plugin.version>1.2.1</mojo.exec.plugin.version>
     </properties>
 
-    <modules> 
-        <module>jee</module> 
-        <module>spring</module> 
-    </modules> 
+    <modules>
+        <module>jee</module>
+        <module>spring</module>
+    </modules>
     
     <build>
         <plugins>
+            <!-- create the address-book JDBC (or File) realm in glassfish -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -52,12 +55,13 @@
                     <arguments>
                         <argument>create-auth-realm</argument>
                         <argument>--classname</argument>
-                        <!--argument>com.sun.enterprise.security.auth.realm.jdbc.JDBCRealm</argument-->
-                        <argument>com.sun.enterprise.security.auth.realm.file.FileRealm</argument>
+                        <argument>com.sun.enterprise.security.auth.realm.jdbc.JDBCRealm</argument>
+                        <!--argument>com.sun.enterprise.security.auth.realm.file.FileRealm</argument-->
                         <argument>--property</argument>
-                        <!--argument>jaas-context=jdbcRealm:datasource-jndi=java\:comp/DefaultDataSource:user-table=contact.PERSON:user-name-column=email:password-column=password:group-table=contact.GROUPS:group-table-user-name-column=name:group-name-column=name:assign-groups=USERS,ADMINS:digest-algorithm=MD5</argument-->
-                        <argument>jaas-context=fileRealm:file=${glassfish.home}/glassfish/domains/${glassfish.domain.name}/config/contact-keyfile</argument>
-                        <argument>contactRealm</argument>
+                        <argument>jaas-context=jdbcRealm:datasource-jndi=java\:comp/DefaultDataSource:user-table=\"USER\":user-name-column=USERNAME:password-column=PASSWORD:group-table=\"USER\":group-name-column=GROUPNAME:digest-algorithm=none</argument>
+                        <!--argument>jaas-context=fileRealm:file=${glassfish.home}/glassfish/domains/${glassfish.domain.name}/config/contact-keyfile</argument-->
+                        <argument>contactJDBCRealm</argument>
+                        <!--argument>contactFileRealm</argument-->
                     </arguments>
                 </configuration>
             </plugin>

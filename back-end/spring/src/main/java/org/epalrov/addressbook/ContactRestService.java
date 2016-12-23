@@ -1,5 +1,5 @@
 /*
- * ContactRestService.java - address book RESTful webservice
+ * ContactRestService.java - contact RESTful service
  * 
  * Copyright (C) 2015 Paolo Rovelli 
  * 
@@ -7,9 +7,6 @@
  */
 
 package org.epalrov.addressbook;
-
-import org.epalrov.addressbook.Contact;
-import org.epalrov.addressbook.ContactDataAccessObjectInterface;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +19,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
-import java.util.LinkedList;
 import java.net.URI;
 
 /**
- * ContactRestService is an EJB exposed as RESTful webservice
+ * ContactRestService is a RESTful service
  */
 @RestController
 @RequestMapping("/contacts")
 public class ContactRestService {
 
     @Autowired
-    private ContactDataAccessObjectInterface dao;
+    private ContactDataAccessObjectInterface contactDao;
+
+    @Autowired
+    private UserDataAccessObjectInterface userDao;
+
+    private Integer getUserId() {
+
+        Authentication auth = SecurityContextHolder
+            .getContext()
+            .getAuthentication();
+
+        return userDao.getUserByName(auth.getName()).getId();
+    }
 
     @RequestMapping(
         method = RequestMethod.GET,
@@ -45,7 +55,8 @@ public class ContactRestService {
             @RequestParam(value = "start", defaultValue = "0") Integer start,
             @RequestParam(value = "max", defaultValue = "100") Integer max,
             @RequestParam(value = "key", defaultValue = "") String key) {
-        return dao.getContacts(start, max, key);
+
+        return contactDao.getContactsByUserId(getUserId(), start, max, key);
     }
 
     @RequestMapping(
@@ -54,25 +65,26 @@ public class ContactRestService {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public Contact getContact(@PathVariable("id") Integer id) {
-        return dao.getContact(id);
+    public Contact getContact(
+            @PathVariable("id") Integer id) {
+
+        return contactDao.getContactByUserId(getUserId(), id);
     }
 
     @RequestMapping(
-//        path = "/",
+//      path = "/",
         method = RequestMethod.POST,
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Void> createContact(@RequestBody Contact contact) {
-        dao.createContact(contact);
+    public ResponseEntity<Void> createContact(
+            @RequestBody Contact contact) {
+
+        contactDao.createContactByUserId(getUserId(), contact);
+
         // returns the URI of the new resource in the HTTP header Location field
         URI uri = ServletUriComponentsBuilder.fromCurrentServletMapping()
             .path("/contacts/{id}").build()
             .expand(contact.getId()).toUri();
-        //
-        //URI uri = uriInfo.getAbsoluteRequestMappingBuilder()
-        //    .path(contact.getId().toString()).build();
-        //return ResponseEntity.created(uri).build();
         return ResponseEntity.created(uri).build();
     }
 
@@ -81,8 +93,12 @@ public class ContactRestService {
         method = RequestMethod.PUT,
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Void> updateContact(@PathVariable("id") Integer id, @RequestBody Contact contact) {
-        dao.updateContact(id, contact);
+    public ResponseEntity<Void> updateContact(
+        @PathVariable("id") Integer id,
+        @RequestBody Contact contact) {
+
+        contactDao.updateContactByUserId(getUserId(), id, contact);
+
         // redirect towards the updated resource
         // URI uri = uriInfo.getAbsoluteRequestMappingBuilder().build();
         // return Response.seeOther(uri).build();
@@ -93,8 +109,11 @@ public class ContactRestService {
         path = "/{id}",
         method = RequestMethod.DELETE
     )
-    public ResponseEntity<Void> deleteContact(@PathVariable("id") Integer id) {
-        dao.deleteContact(id);
+    public ResponseEntity<Void> deleteContact(
+            @PathVariable("id") Integer id) {
+
+        contactDao.deleteContactByUserId(getUserId(), id);
+
         // ok response with no body
         return ResponseEntity.noContent().build();
     }

@@ -19,11 +19,16 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Contact entity.
@@ -31,6 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "CONTACT")
 @NamedQueries({
+    /* contacts */
     @NamedQuery(name = "getContact",
                 query = "SELECT c FROM Contact c " +
                         "WHERE c.id = :id"),
@@ -44,9 +50,50 @@ import javax.xml.bind.annotation.XmlRootElement;
                         "             c.email) LIKE :key " +
                         "ORDER BY c.firstName,c.lastName"),
     @NamedQuery(name = "countContacts",
-                query = "SELECT COUNT(c.id) FROM Contact c")
+                query = "SELECT COUNT(c.id) FROM Contact c"),
+
+    /* contacts by user */
+    @NamedQuery(name = "getContactByUserId",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.user.id = :userId " +
+                        "AND c.id = :contactId"),
+    @NamedQuery(name = "getContactsByUserId",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.user.id = :userId " +
+                        "ORDER BY c.firstName,c.lastName"),
+    @NamedQuery(name = "findContactsByUserId",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.user.id = :userId " +
+                        "AND CONCAT(c.firstName, ' ', " +
+                        "           c.lastName, ' ', " + 
+                        "           c.email) LIKE :key " +
+                        "ORDER BY c.firstName,c.lastName"),
+    @NamedQuery(name = "countContactsiByUserId",
+                query = "SELECT COUNT(c.id) FROM Contact c " +
+                        "WHERE c.user.id = :userId"),
+
+    /* contacts by username */
+    @NamedQuery(name = "getContactByUserName",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.user.username = :userName " +
+                        "AND c.id = :contactId"),
+    @NamedQuery(name = "getContactsByUserName",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.user.username = :userName " +
+                        "ORDER BY c.firstName,c.lastName"),
+    @NamedQuery(name = "findContactsByUserName",
+                query = "SELECT c FROM Contact c " +
+                        "WHERE c.user.username = :userName " +
+                        "AND CONCAT(c.firstName, ' ', " +
+                        "           c.lastName, ' ', " + 
+                        "           c.email) LIKE :key " +
+                        "ORDER BY c.firstName,c.lastName"),
+    @NamedQuery(name = "countContactsiByUserName",
+                query = "SELECT COUNT(c.id) FROM Contact c " +
+                        "WHERE c.user.username = :user")
 })
-@XmlRootElement
+@XmlRootElement(name = "Contact")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Contact implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -58,17 +105,21 @@ public class Contact implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @Column(name = "FIRSTNAME")
-    @Size(min=0, max=50, message="{contact.firstname}")
+    @Size(min = 0, max = 50, message = "{contact.firstname}")
     private String firstName;
     @Basic(optional = false)
     @Column(name = "LASTNAME")
-    @Size(min=0, max=50, message="{contact.lastname}")
+    @Size(min = 0, max = 50, message = "{contact.lastname}")
     private String lastName;
     @Basic(optional = false)
     @Column(name = "EMAIL")
-    @Size(min=3, max=50, message= "{contact.email}")
-    @Pattern(regexp = ".+@.+\\.[a-z]+", message= "{contact.email}")
+    @Size(min = 3, max = 50, message = "{contact.email}")
+    @Pattern(regexp = ".+@.+\\.[a-z]+", message = "{contact.email}")
     private String email;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
+    @XmlTransient
+    private User user;
 
     public Contact() {
     }
@@ -113,16 +164,21 @@ public class Contact implements Serializable {
         this.email = email;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
-        // same reference
         if (o == this)
             return true;
-        // check instance type 
         if (!(o instanceof Contact)) 
             return false;
 
-        // safe cast and comparison
         Contact other = (Contact)o;
         if ((this.id == null && other.id != null) ||
                 (this.id != null && !this.id.equals(other.id))) {

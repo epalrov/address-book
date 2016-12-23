@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <display-name>Address Book</display-name>
+
+    <!-- security type: BASIC authentication in the specified realm -->
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>contactJDBCRealm</realm-name>
+    </login-config>
+
+    <!-- security roles: declaration -->
+    <security-role>
+        <role-name>AdminUser</role-name>
+    </security-role>
+    <security-role>
+        <role-name>EndUser</role-name>
+    </security-role>
+
+    <!-- security constraint -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>End User Resources</web-resource-name>
+            <url-pattern>/rest-api/users/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>AdminUser</role-name>
+            <role-name>EndUser</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>End User Resources</web-resource-name>
+            <url-pattern>/rest-api/contacts/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>EndUser</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!--data-source>
+        <description>Address Book data source.</description>
+        <name>java:global/DefaultDataSource</name>
+        <class-name>org.apache.derby.jdbc.ClientDataSource</class-name>
+        <server-name>localhost</server-name>
+        <port-number>1527</port-number>
+        <database-name>sun-appserv-samples</database-name>
+    </data-source-->
+    <!--url>jdbc:derby://localhost:1527/sun-appserv-samples;create=false</url-->
+
+</web-app>
+
