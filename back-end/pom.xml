@@ -29,44 +29,6 @@
         <module>jee</module>
         <module>spring</module>
     </modules>
-    
-    <build>
-        <plugins>
-            <!-- create the address-book JDBC (or File) realm in glassfish -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${mojo.exec.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <skip>false</skip>
-                    <executable>${glassfish.home}/bin/asadmin</executable>
-                    <successCodes>
-                        <successCode>0</successCode>
-                        <successCode>1</successCode>
-                    </successCodes>
-                    <arguments>
-                        <argument>create-auth-realm</argument>
-                        <argument>--classname</argument>
-                        <argument>com.sun.enterprise.security.auth.realm.jdbc.JDBCRealm</argument>
-                        <!--argument>com.sun.enterprise.security.auth.realm.file.FileRealm</argument-->
-                        <argument>--property</argument>
-                        <argument>jaas-context=jdbcRealm:datasource-jndi=java\:comp/DefaultDataSource:user-table=\"USER\":user-name-column=USERNAME:password-column=PASSWORD:group-table=\"USER\":group-name-column=GROUPNAME:digest-algorithm=none</argument>
-                        <!--argument>jaas-context=fileRealm:file=${glassfish.home}/glassfish/domains/${glassfish.domain.name}/config/contact-keyfile</argument-->
-                        <argument>contactJDBCRealm</argument>
-                        <!--argument>contactFileRealm</argument-->
-                    </arguments>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
 

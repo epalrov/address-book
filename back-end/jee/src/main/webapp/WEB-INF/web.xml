@@ -23,7 +23,7 @@
     <!-- security constraint -->
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>End User Resources</web-resource-name>
+            <web-resource-name>Admin User Resources</web-resource-name>
             <url-pattern>/rest-api/users/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
@@ -37,6 +37,7 @@
             <url-pattern>/rest-api/contacts/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
+            <role-name>AdminUser</role-name>
             <role-name>EndUser</role-name>
         </auth-constraint>
     </security-constraint>

@@ -14,7 +14,7 @@ define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
 
     app.factory('contactService', ['$resource', function($resource) {
         // return $resource('rest-api/contacts/:id', { id: '@id' }, {
-        return $resource('http://localhost:8080/address-book-jee/rest-api/contacts/:id', { id: '@id' }, {
+        return $resource('http://localhost:8080/address-book-spring/rest-api/contacts/:id', { id: '@id' }, {
             update: {
                 method: 'PUT'
             }

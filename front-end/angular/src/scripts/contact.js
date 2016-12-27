@@ -10,16 +10,16 @@ require.config({
     baseUrl: '.',
     paths: {
         'angular' : [
-            'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min',
+//          'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min',
             'bower_components/angular/angular.min'],
         'ng-resource' : [
-            'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-resource.min',
+//          'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular-resource.min',
             'bower_components/angular-resource/angular-resource.min'],
         'ng-bootstrap' : [
-            'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min',
+//          'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls.min',
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.min'],
         'xml2json' : [
-            'https://x2js.googlecode.com/hg/xml2json.min',
+//          'https://x2js.googlecode.com/hg/xml2json.min',
             'bower_components/x2js/xml2json.min']
     },
     shim: {

@@ -16,16 +16,11 @@
     </parent>
 
     <dependencies>
+        <!-- JEE API - we still use the standard JPA notation with Hibernate -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>${javax.javaee.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${javax.servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Spring -->
@@ -59,7 +54,6 @@
             <artifactId>spring-security-web</artifactId>
             <version>${spring.security.version}</version>
         </dependency>
-
         <!-- Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>

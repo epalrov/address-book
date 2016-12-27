@@ -1,9 +1,7 @@
 Address Book
 ============
 
-Implementation of a simple Address Book as a single page application (SPA)
-within a thin server architecture (TSA). Modern Web technologies are combined
-and widely expolred in a splitted front-end/back-end architecture:
+Implementation of a simple Address Book as a single page application (SPA) within a thin server architecture (TSA). Modern Web technologies are combined and widely expolred in a splitted front-end/back-end architecture:
 
   - multiple Web interfaces: REST, SOAP, WebSockets.
   - multiple back-end implementations: JEE, Spring and Hibernate frameworks.
@@ -17,12 +15,14 @@ To install all the required dependencies check first [INSTALL.md].
 Start the Glassfish application server
 --------------------------------------
 
-To start the locally installed Glassfish server:
+To start the locally installed Glassfish server and database:
 
   ```
   ~/glassfish4/glassfish/bin/asadmin start-database && \
   ~/glassfish4/glassfish/bin/asadmin start-domain --verbose
   ```
+
+By default Glassfish uses a Derby database which can be inspected using the `ij` interactive SQL scripting tool through the command `connect 'jdbc:derby://localhost:1527/sun-appserv-samples;create=false';`. No authentication is required to access the default `sun-appserv-samples` database instance.
 
 Build and deploy the Address Book project
 -----------------------------------------
