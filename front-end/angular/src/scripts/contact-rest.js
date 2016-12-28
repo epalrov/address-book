@@ -6,8 +6,6 @@
  * Author: Paolo Rovelli <paolorovelli@yahoo.it>
  */
 
-
-
 define(['angular', 'ng-resource', 'ng-bootstrap'], function (angular) {
 
     var app = angular.module('contactApp', ['ngResource', 'ui.bootstrap']);

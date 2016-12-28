@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Stateless
 @WebService(
-    serviceName="address-book/soap-api",
+    serviceName="address-book-jee/soap-api",
     portName = "ContactSoapServicePort",
     targetNamespace = "http://addressbook.epalrov.org")
     // endpointInterface = "org.epalrov.addressbook.ContactSoapService"

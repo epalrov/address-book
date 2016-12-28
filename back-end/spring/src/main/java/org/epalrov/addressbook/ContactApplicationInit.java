@@ -22,12 +22,12 @@ public class ContactApplicationInit implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
 
-        // Create the dispatcher servlet's Spring application context
+        /* Create the dispatcher servlet's Spring application context */
         AnnotationConfigWebApplicationContext dispatcherContext =
             new AnnotationConfigWebApplicationContext();
         dispatcherContext.register(ContactApplicationConfig.class);
 
-        // Register and map the dispatcher servlet
+        /* Register and map the dispatcher servlet */
         ServletRegistration.Dynamic dispatcher =
             servletContext.addServlet("dispatcher",
                 new DispatcherServlet(dispatcherContext));
